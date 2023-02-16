@@ -1,15 +1,16 @@
 package com.unipi.msc.spaceroomapi.Model.User;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +21,9 @@ public class Client extends User{
     @Id
     @GeneratedValue
     private Long Id;
-
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Reservation> reservations;
     public Client(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         super(email, username, password, role, gender, firstName, lastName, birthday);
     }

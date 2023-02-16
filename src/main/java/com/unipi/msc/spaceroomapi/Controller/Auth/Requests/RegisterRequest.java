@@ -1,10 +1,6 @@
 package com.unipi.msc.spaceroomapi.Controller.Auth.Requests;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
-
-import java.util.List;
 
 @Data
 @Builder

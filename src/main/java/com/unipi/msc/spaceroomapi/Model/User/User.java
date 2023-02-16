@@ -2,6 +2,7 @@ package com.unipi.msc.spaceroomapi.Model.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDao;
@@ -57,6 +58,9 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<UserDao> userDaos = new ArrayList<>();
 
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
     public User(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         this.email = email;
         this.username = username;

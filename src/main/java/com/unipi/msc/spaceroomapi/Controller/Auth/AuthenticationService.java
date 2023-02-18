@@ -3,6 +3,7 @@ package com.unipi.msc.spaceroomapi.Controller.Auth;
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.LoginRequest;
 import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.RegisterRequest;
+import com.unipi.msc.spaceroomapi.Controller.Image.Response.ImagePresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Responses.UserPresenter;
 import com.unipi.msc.spaceroomapi.Model.User.*;
@@ -128,6 +129,12 @@ public class AuthenticationService {
         }
         if (user instanceof Owner){
             Owner d = (Owner) user;
+        }
+        if (user.getImage()!=null){
+            response.setImage(ImagePresenter.builder()
+                            .link("/image/"+user.getImage().getId())
+                            .id(user.getImage().getId())
+                    .build());
         }
         return response;
     }

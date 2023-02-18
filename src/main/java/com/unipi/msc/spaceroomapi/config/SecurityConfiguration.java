@@ -27,8 +27,12 @@ public class SecurityConfiguration {
                 .disable()
                 .cors().and()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/auth/*/logout").authenticated()
+                .requestMatchers("/auth/**",
+                        "/house/*",
+                        "/image/**").permitAll()
+                .requestMatchers("/auth/*/logout",
+                                 "/house/*/image/*,",
+                                 "/house/*/image").authenticated()
                 .anyRequest()
                 .authenticated()
                 .and()

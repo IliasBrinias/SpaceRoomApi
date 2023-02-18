@@ -19,10 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @DiscriminatorValue(value = "OWNER")
 public class Owner extends User{
-    @Id
-    @GeneratedValue
-    private Long Id;
-
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<House> houses = new ArrayList<>();

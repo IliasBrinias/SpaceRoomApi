@@ -24,7 +24,7 @@ public class House {
     private String title;
     private String description;
     private Integer maxCapacity;
-    private Long price;
+    private Double price;
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Image> images = new ArrayList<>();

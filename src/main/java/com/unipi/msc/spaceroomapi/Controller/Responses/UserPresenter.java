@@ -1,5 +1,6 @@
 package com.unipi.msc.spaceroomapi.Controller.Responses;
 
+import com.unipi.msc.spaceroomapi.Controller.Image.Response.ImagePresenter;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class UserPresenter {
     private Long id;
     private String email;
     private String username;
+    private ImagePresenter image;
     private Role role;
     private String firstName;
     private String lastName;

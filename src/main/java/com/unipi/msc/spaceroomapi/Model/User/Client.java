@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,12 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @DiscriminatorValue(value = "CLIENT")
 public class Client extends User{
-    @Id
-    @GeneratedValue
-    private Long Id;
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<>();
     public Client(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         super(email, username, password, role, gender, firstName, lastName, birthday);
     }

@@ -39,5 +39,12 @@ public class ErrorMessages {
     public static final String ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE = "Only the owner can edit the house";
     public static final String NOT_VALID_IMAGE_IDX = "Not valid image index";
     public static final String IMAGE_NOT_FOUND = "ImageController not found";
-    public static final String GENDER_NOT_VALID = "Gender not valid";
+    public static final String GENDER_NOT_VALID = "gender not valid";
+    public static final String HOUSE_ID_IS_OBLIGATORY = "houseId is obligatory";
+    public static final String DATE_IS_OBLIGATORY = "date is obligatory";
+    public static final String USER_MUST_BE_CLIENT = "User must be client";
+    public static final String RESERVATION_ID_IS_OBLIGATORY = "reservationId is obligatory";
+    public static final String STATUS_NOT_VALID = "Status not valid";
+    public static final String RESERVATION_NOT_FOUND = "Reservation not found";
+    public static final String RESERVATION_IS_NOT_FOR_THIS_CLIENT = "Reservation is not for this client";
 }

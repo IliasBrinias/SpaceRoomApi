@@ -10,7 +10,7 @@ import com.unipi.msc.spaceroomapi.Model.House.HouseService;
 import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
-import com.unipi.msc.spaceroomapi.Model.User.Owner;
+import com.unipi.msc.spaceroomapi.Model.User.Host;
 import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -47,11 +47,11 @@ public class HouseController {
     }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addHouses(@ModelAttribute HouseRequest request) {
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
 
         if (request.getTitle().equals("")) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_IS_OBLIGATORY));
@@ -66,7 +66,7 @@ public class HouseController {
                 .description(request.getDescription())
                 .maxCapacity(request.getMaxCapacity())
                 .price(request.getPrice())
-                .owner(owner)
+                .host(host)
                 .build());
         h.setImages(new ArrayList<>());
         if (request.getImages()!=null){
@@ -83,15 +83,15 @@ public class HouseController {
     }
     @PatchMapping("{id}")
     public ResponseEntity<?> updateHouses(@PathVariable Long id, @ModelAttribute HouseRequest request) {
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getOwner().getId().equals(owner.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE));
+        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
         if (!request.getTitle().equals("")) {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_IS_OBLIGATORY));
         }
@@ -105,29 +105,29 @@ public class HouseController {
     }
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteHouse(@PathVariable Long id){
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getOwner().getId().equals(owner.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE));
+        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
         houseRepository.delete(h);
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("{houseId}/image/{id}")
     public ResponseEntity<?> deleteHouseImage(@PathVariable Long houseId, @PathVariable Long id){
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
         House h = houseService.getHouse(houseId).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getOwner().getId().equals(owner.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE));
+        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
         Image image = h.getImages().stream()
                 .filter(img -> Objects.equals(img.getId(), id))
                 .findFirst().orElse(null);
@@ -139,15 +139,15 @@ public class HouseController {
     }
     @PatchMapping("{houseId}/image/{id}")
     public ResponseEntity<?> editHouseImage(@PathVariable Long houseId, @PathVariable Long id, @RequestParam("image") MultipartFile newImg){
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
         House h = houseService.getHouse(houseId).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getOwner().getId().equals(owner.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE));
+        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
         Image image = h.getImages().stream()
                 .filter(img -> Objects.equals(img.getId(), id))
                 .findFirst().orElse(null);
@@ -163,15 +163,15 @@ public class HouseController {
     }
     @PostMapping(value = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> editHouseImage(@PathVariable Long id, @RequestParam("image") MultipartFile newImg) {
-        Owner owner;
+        Host host;
         try {
-            owner = (Owner) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_OWNER));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getOwner().getId().equals(owner.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE));
+        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
         try {
             imageService.uploadHouseImage(newImg,h);
         } catch (Exception e) {

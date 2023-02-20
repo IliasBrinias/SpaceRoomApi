@@ -69,8 +69,8 @@ public class AuthenticationService {
                     request.getLastName(),
                     request.getBirthday());
         }
-        else if (role==Role.OWNER){
-            user = new Owner(request.getEmail(),
+        else if (role==Role.HOST){
+            user = new Host(request.getEmail(),
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
                     role,
@@ -127,8 +127,8 @@ public class AuthenticationService {
         if (user instanceof Client){
             Client c = (Client) user;
         }
-        if (user instanceof Owner){
-            Owner d = (Owner) user;
+        if (user instanceof Host){
+            Host d = (Host) user;
         }
         if (user.getImage()!=null){
             response.setImage(ImagePresenter.builder()

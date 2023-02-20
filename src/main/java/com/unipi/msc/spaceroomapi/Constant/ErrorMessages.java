@@ -34,9 +34,9 @@ public class ErrorMessages {
     public static final String PRICE_IS_OBLIGATORY = "Price is obligatory";
     public static final String PRICE_MUST_BE_GREATER_THAN_ZERO = "Price must be greater than zero";
     public static final String HOUSE_NOT_FOUND = "House not found";
-    public static final String USER_MUST_BE_OWNER = "User must be owner";
+    public static final String USER_MUST_BE_HOST = "User must be host";
     public static final String PLEASE_TRY_AGAIN_LATER = "Please try again later";
-    public static final String ONLY_THE_OWNER_CAN_EDIT_THE_HOUSE = "Only the owner can edit the house";
+    public static final String ONLY_THE_HOST_CAN_EDIT_THE_HOUSE = "Only the host can edit the house";
     public static final String NOT_VALID_IMAGE_IDX = "Not valid image index";
     public static final String IMAGE_NOT_FOUND = "ImageController not found";
     public static final String GENDER_NOT_VALID = "gender not valid";

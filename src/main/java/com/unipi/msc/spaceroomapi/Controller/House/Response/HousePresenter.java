@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class HousePresenter {
     private Long Id;
-    private Long ownerId;
+    private Long hostId;
     private String title;
     private String description;
     private Integer maxCapacity;
@@ -33,7 +33,7 @@ public class HousePresenter {
         }
         return HousePresenter.builder()
                 .Id(h.getId())
-                .ownerId(h.getOwner().getId())
+                .hostId(h.getHost().getId())
                 .description(h.getDescription())
                 .maxCapacity(h.getMaxCapacity())
                 .price(h.getPrice())

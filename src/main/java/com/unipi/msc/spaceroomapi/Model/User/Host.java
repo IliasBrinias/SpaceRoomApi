@@ -17,12 +17,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@DiscriminatorValue(value = "OWNER")
-public class Owner extends User{
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+@DiscriminatorValue(value = "HOST")
+public class Host extends User{
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<House> houses = new ArrayList<>();
-    public Owner(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
+    public Host(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         super(email, username, password, role, gender, firstName, lastName, birthday);
     }
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.unipi.msc.spaceroomapi.Model.Image.Image;
-import com.unipi.msc.spaceroomapi.Model.User.Owner;
+import com.unipi.msc.spaceroomapi.Model.User.Host;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +30,8 @@ public class House {
     private List<Image> images = new ArrayList<>();
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "host_id")
     @JsonBackReference
-    private Owner owner;
+    private Host host;
 
 }

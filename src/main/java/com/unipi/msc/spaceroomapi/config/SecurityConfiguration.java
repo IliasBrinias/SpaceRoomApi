@@ -30,7 +30,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/auth/**",
                         "/house/*",
                         "/image/**").permitAll()
-                .requestMatchers("/auth/*/logout",
+                .requestMatchers("/auth/logout",
                                  "/house/*/image/*,",
                                  "/house/*/image").authenticated()
                 .anyRequest()

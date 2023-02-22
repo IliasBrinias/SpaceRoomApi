@@ -1,6 +1,7 @@
 package com.unipi.msc.spaceroomapi.Controller.House.Request;
 
 import lombok.*;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 public class HouseRequest {
-    private String title;
-    private String description;
-    private Integer maxCapacity;
-    private Double price;
-    private List<MultipartFile> images;
+    String title;
+    String description;
+    Integer maxCapacity;
+    Double price;
+    List<MultipartFile> images;
 }

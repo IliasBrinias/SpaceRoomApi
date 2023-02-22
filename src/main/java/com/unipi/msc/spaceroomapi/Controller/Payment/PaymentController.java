@@ -5,7 +5,7 @@ import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Payment.Request.PaymentRequest;
 import com.unipi.msc.spaceroomapi.Controller.Payment.Request.PaymentResultRequest;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
-import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
 import com.unipi.msc.spaceroomapi.Model.House.House;
 import com.unipi.msc.spaceroomapi.Model.House.HouseService;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;

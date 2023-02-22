@@ -2,7 +2,7 @@ package com.unipi.msc.spaceroomapi.Model.Reservation;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
 import com.unipi.msc.spaceroomapi.Model.House.House;
 import com.unipi.msc.spaceroomapi.Model.User.Client;
 import jakarta.persistence.*;

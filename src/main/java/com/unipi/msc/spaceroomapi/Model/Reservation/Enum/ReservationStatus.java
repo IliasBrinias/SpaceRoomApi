@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Model.Enum;
+package com.unipi.msc.spaceroomapi.Model.Reservation.Enum;
 
 public enum ReservationStatus {
     PENDING,

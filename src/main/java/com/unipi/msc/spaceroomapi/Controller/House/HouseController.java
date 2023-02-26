@@ -1,15 +1,18 @@
 package com.unipi.msc.spaceroomapi.Controller.House;
 
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
-import com.unipi.msc.spaceroomapi.Controller.House.Request.HouseRequest;
-import com.unipi.msc.spaceroomapi.Controller.House.Response.HousePresenter;
+import com.unipi.msc.spaceroomapi.Controller.Request.HouseRequest;
+import com.unipi.msc.spaceroomapi.Controller.Responses.HousePresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
+import com.unipi.msc.spaceroomapi.Controller.Responses.ReservationPresenter;
 import com.unipi.msc.spaceroomapi.Model.House.House;
 import com.unipi.msc.spaceroomapi.Model.House.HouseRepository;
 import com.unipi.msc.spaceroomapi.Model.House.HouseService;
 import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
+import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
 import com.unipi.msc.spaceroomapi.Model.User.Host;
 import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +34,26 @@ public class HouseController {
     private final HouseRepository houseRepository;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
+    private final ReservationService reservationService;
     @GetMapping("/all")
-    public ResponseEntity<?> getHouses(){
+    public ResponseEntity<?> getAllHouses(){
         List<HousePresenter> housePresenters = new ArrayList<>();
         for (House h:houseService.getHouses()){
-            housePresenters.add(HousePresenter.getHousePresenter(h));
+            housePresenters.add(HousePresenter.getHouse(h));
+        }
+        return ResponseEntity.ok(housePresenters);
+    }
+    @GetMapping
+    public ResponseEntity<?> getHouses(){
+        Host host;
+        try {
+            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }catch (ClassCastException ignore){
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
+        }
+        List<HousePresenter> housePresenters = new ArrayList<>();
+        for (House h:houseService.getHousesFromHost(host)){
+            housePresenters.add(HousePresenter.getHouse(h));
         }
         return ResponseEntity.ok(housePresenters);
     }
@@ -43,7 +61,8 @@ public class HouseController {
     public ResponseEntity<?> getHouse(@PathVariable Long id){
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        return ResponseEntity.ok(HousePresenter.getHousePresenter(h));
+        List<Reservation> reservations = reservationService.getHouseReservation(h);
+        return ResponseEntity.ok(HousePresenter.getHouseWithReservationDates(h,reservations));
     }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addHouses(@ModelAttribute HouseRequest request) {
@@ -82,7 +101,7 @@ public class HouseController {
                 return ResponseEntity.internalServerError().body(new ErrorResponse(false, ErrorMessages.PLEASE_TRY_AGAIN_LATER));
             }
         }
-        return ResponseEntity.ok(HousePresenter.getHousePresenter(h));
+        return ResponseEntity.ok(HousePresenter.getHouse(h));
     }
     @PatchMapping("{id}/edit")
     public ResponseEntity<?> updateHouses(@PathVariable Long id, @RequestBody HouseRequest request) {
@@ -127,7 +146,7 @@ public class HouseController {
         if (request.getPrice() != null) {
             if (request.getPrice() > 0) h.setPrice(request.getPrice());
         }
-        return ResponseEntity.ok(HousePresenter.getHousePresenter(h));
+        return ResponseEntity.ok(HousePresenter.getHouse(h));
     }
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteHouse(@PathVariable Long id){
@@ -205,6 +224,13 @@ public class HouseController {
             return ResponseEntity.internalServerError().body(new ErrorResponse(false, ErrorMessages.PLEASE_TRY_AGAIN_LATER));
         }
         return ResponseEntity.ok().build();
-
+    }
+    @GetMapping("{id}/reservation")
+    public ResponseEntity<?> getHouseReservation(@PathVariable Long id) {
+        House h = houseService.getHouse(id).orElse(null);
+        if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
+        List<ReservationPresenter> response = new ArrayList<>();
+        reservationService.getHouseReservation(h).forEach(r-> response.add(ReservationPresenter.getReservation(r)));
+        return ResponseEntity.ok(response);
     }
 }

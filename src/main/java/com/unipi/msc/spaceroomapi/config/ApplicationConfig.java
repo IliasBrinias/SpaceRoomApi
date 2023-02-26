@@ -1,6 +1,7 @@
 package com.unipi.msc.spaceroomapi.config;
 
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
+import com.unipi.msc.spaceroomapi.Model.User.User;
 import com.unipi.msc.spaceroomapi.Model.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,8 +22,18 @@ public class ApplicationConfig {
     private final UserRepository userRepository;
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(()->new UsernameNotFoundException(ErrorMessages.USER_NOT_FOUND));
+        return username -> {
+            User user = userRepository.findByUsername(username)
+                    .orElse(null);
+            if (user == null){
+                user = userRepository.findByEmail(username)
+                        .orElse(null);
+            }
+            if (user == null){
+                throw new UsernameNotFoundException(ErrorMessages.USER_NOT_FOUND);
+            }
+            return user;
+        };
     }
     @Bean
     public AuthenticationProvider authenticationProvider(){

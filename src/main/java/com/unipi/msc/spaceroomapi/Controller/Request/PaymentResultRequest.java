@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.Payment.Request;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.*;
 

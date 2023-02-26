@@ -52,4 +52,5 @@ public class ErrorMessages {
     public static final String BODY_CANNOT_BE_EMPTY = "Body cannot be empty";
     public static final String LOCATION_IS_OBLIGATORY = "Location is obligatory";
     public static final String LOCATION_CANT_BE_EMPTY = "Location cannot be empty";
+    public static final String NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION = "Not authorized to reject this reservation";
 }

@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.Image.Response;
+package com.unipi.msc.spaceroomapi.Controller.Responses;
 
 import lombok.*;
 

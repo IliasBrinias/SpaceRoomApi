@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.Auth.Requests;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginRequest {
     private String username;
+    private String email;
     private String password;
 }

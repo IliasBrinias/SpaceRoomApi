@@ -22,15 +22,13 @@ public class Reservation {
     private ReservationStatus status;
     private Long dateFrom;
     private Long dateTo;
-
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "house_id")
     @JsonBackReference
     private House house;
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
-
 }

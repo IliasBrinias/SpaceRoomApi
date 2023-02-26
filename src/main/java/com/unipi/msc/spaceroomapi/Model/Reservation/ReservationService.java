@@ -1,8 +1,11 @@
 package com.unipi.msc.spaceroomapi.Model.Reservation;
 
+import com.unipi.msc.spaceroomapi.Model.House.House;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -12,5 +15,8 @@ public class ReservationService {
 
     public Optional<Reservation> getReservationWithId(Long reservationId) {
         return reservationRepository.findById(reservationId);
+    }
+    public List<Reservation> getHouseReservation(House h) {
+        return reservationRepository.findAllByHouseAndStatusOrderByDateFromAsc(h, ReservationStatus.SUCCESS);
     }
 }

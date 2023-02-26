@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.House.Request;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.*;
 import org.springframework.web.bind.annotation.RequestParam;

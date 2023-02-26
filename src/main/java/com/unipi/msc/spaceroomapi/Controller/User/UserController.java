@@ -8,6 +8,7 @@ import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
+import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
 import com.unipi.msc.spaceroomapi.Model.User.User;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDao;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDaoService;
@@ -51,6 +52,15 @@ public class UserController {
         if (request.getFirstName()!=null) u.setFirstName(request.getFirstName());
         if (request.getLastName()!=null) u.setLastName(request.getLastName());
         if (request.getBirthday()!=null) u.setBirthday(request.getBirthday());
+        if (u.getRole() == Role.USER && request.getRole()!=null){
+            Role role;
+            try {
+                role = Role.valueOf(request.getRole().toUpperCase());
+            }catch (Exception ignore){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_DOESNT_EXIST));
+            }
+            u.setRole(role);
+        }
         String token = null;
         UserDao userDao = userDaoService.getLastToken(u).orElse(null);
         if (userDao != null) token = userDao.getToken();

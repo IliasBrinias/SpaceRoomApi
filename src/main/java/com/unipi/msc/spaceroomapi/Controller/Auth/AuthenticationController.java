@@ -1,7 +1,7 @@
 package com.unipi.msc.spaceroomapi.Controller.Auth;
 
-import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.LoginRequest;
-import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.RegisterRequest;
+import com.unipi.msc.spaceroomapi.Controller.Request.LoginRequest;
+import com.unipi.msc.spaceroomapi.Controller.Request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +19,10 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest request){
         return authenticationService.authenticate(request);
+    }
+    @PostMapping("/login/google")
+    public ResponseEntity<?> authenticateWithGoogle(@RequestBody LoginRequest request){
+        return authenticationService.loginWithGoogle(request);
     }
     @PostMapping("/logout")
     public ResponseEntity<?> logout(){

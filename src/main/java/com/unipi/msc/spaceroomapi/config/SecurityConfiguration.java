@@ -29,6 +29,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers("/auth/**",
                         "/house/*",
+                        "/house/*/reservation",
                         "/image/**").permitAll()
                 .requestMatchers("/auth/logout",
                                  "/house/*/image/*,",

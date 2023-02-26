@@ -1,9 +1,9 @@
 package com.unipi.msc.spaceroomapi.Controller.Auth;
 
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
-import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.LoginRequest;
-import com.unipi.msc.spaceroomapi.Controller.Auth.Requests.RegisterRequest;
-import com.unipi.msc.spaceroomapi.Controller.Image.Response.ImagePresenter;
+import com.unipi.msc.spaceroomapi.Controller.Request.LoginRequest;
+import com.unipi.msc.spaceroomapi.Controller.Request.RegisterRequest;
+import com.unipi.msc.spaceroomapi.Controller.Responses.ImagePresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Responses.UserPresenter;
 import com.unipi.msc.spaceroomapi.Model.User.*;
@@ -43,7 +43,6 @@ public class AuthenticationService {
         if (!error_msg.equals("")) return ResponseEntity.badRequest().body(new ErrorResponse(false,error_msg));
 
         Role role;
-        Gender gender;
         try {
             role = Role.valueOf(request.getRole().toUpperCase());
         } catch (Exception ex) {
@@ -84,7 +83,15 @@ public class AuthenticationService {
                     null
             );
         }else {
-            return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_IS_NULL));
+            user = new User(request.getEmail(),
+                    request.getUsername(),
+                    passwordEncoder.encode(request.getPassword()),
+                    Role.USER,
+                    Gender.OTHER,
+                    null,
+                    null,
+                    null
+            );
         }
         user.setCreationDate(new Date().getTime());
         user = userRepository.save(user);
@@ -101,9 +108,9 @@ public class AuthenticationService {
     }
     public ResponseEntity<?> authenticate(LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        // double check if the user exists
-        if (userRepository.findByUsername(request.getUsername()).isEmpty()) return ResponseEntity.notFound().build();
-        User user = userRepository.findByUsername(request.getUsername()).get();
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
+        if (user == null) user = userRepository.findByEmail(request.getUsername()).orElse(null);
+        if (user == null) return  ResponseEntity.notFound().build();
         return ResponseEntity.ok(getAuthenticationResponse(user, jwtService.generateToken(user)));
     }
     public UserPresenter getAuthenticationResponse(User user, String jwtToken) {
@@ -147,5 +154,18 @@ public class AuthenticationService {
         userDao.setIsActive(false);
         userDaoRepository.save(userDao);
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> loginWithGoogle(LoginRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()){
+            return authenticate(LoginRequest.builder()
+                    .username(request.getEmail())
+                    .password(request.getPassword())
+                    .build());
+        }
+        return register(RegisterRequest.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build());
     }
 }

@@ -34,5 +34,4 @@ public class House {
     @JoinColumn(name = "host_id")
     @JsonBackReference
     private Host host;
-
 }

@@ -1,5 +1,6 @@
 package com.unipi.msc.spaceroomapi.Model.House;
 
+import com.unipi.msc.spaceroomapi.Model.User.Host;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,5 +17,9 @@ public class HouseService {
     }
     public Optional<House> getHouse(Long Id) {
         return houseRepository.findById(Id);
+    }
+
+    public List<House> getHousesFromHost(Host host) {
+        return houseRepository.findAllByHost(host);
     }
 }

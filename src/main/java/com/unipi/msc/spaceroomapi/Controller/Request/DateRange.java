@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.Payment.Request;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DateRangeRequest {
+public class DateRange {
     private Long from;
     private Long to;
 }

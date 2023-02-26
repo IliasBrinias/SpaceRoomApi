@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.Payment.Request;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.*;
 
@@ -7,8 +7,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentRequest {
+public class ReservationRequest {
     private Double price;
-    private DateRangeRequest date;
+    private DateRange date;
     private Long houseId;
 }

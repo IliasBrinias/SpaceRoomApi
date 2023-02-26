@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Controller.User.Request;
+package com.unipi.msc.spaceroomapi.Controller.Request;
 
 import lombok.*;
 
@@ -7,6 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequest {
+    private String email;
+    private String username;
     private String gender;
     private String firstName;
     private String lastName;

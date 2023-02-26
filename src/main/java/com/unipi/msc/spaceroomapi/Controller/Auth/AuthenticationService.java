@@ -33,9 +33,9 @@ public class AuthenticationService {
     private final UserDaoService userDaoService;
     private final UserDaoRepository userDaoRepository;
 
-    public ResponseEntity<?> register(RegisterRequest request) {
+    public ResponseEntity<?> register(RegisterRequest request,Boolean isGoogleAccount) {
         // check for empty data
-        if (request.getUsername().equals("") || request.getEmail().equals("") || request.getPassword().equals("")) {
+        if ((request.getUsername()==null && request.getEmail()==null) || request.getPassword()==null) {
             return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.FILL_ALL_THE_FIELDS));
         }
         // check if the user exists
@@ -93,6 +93,7 @@ public class AuthenticationService {
                     null
             );
         }
+        user.setIsGoogleAccount(isGoogleAccount);
         user.setCreationDate(new Date().getTime());
         user = userRepository.save(user);
 
@@ -166,6 +167,6 @@ public class AuthenticationService {
         return register(RegisterRequest.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
-                .build());
+                .build(), true);
     }
 }

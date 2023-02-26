@@ -3,8 +3,7 @@ package com.unipi.msc.spaceroomapi.Controller.User;
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Auth.AuthenticationService;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
-import com.unipi.msc.spaceroomapi.Controller.User.Request.UserRequest;
-import com.unipi.msc.spaceroomapi.Model.Image.Image;
+import com.unipi.msc.spaceroomapi.Controller.Request.UserRequest;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
@@ -15,7 +14,6 @@ import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDaoService;
 import com.unipi.msc.spaceroomapi.Model.User.UserRepository;
 import com.unipi.msc.spaceroomapi.Model.User.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.validator.EmailValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +46,19 @@ public class UserController {
             u.setGender(gender);
         }catch (Exception ignore){
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.GENDER_NOT_VALID));
+        }
+        if (request.getEmail()!=null){
+            if (u.getIsGoogleAccount()) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT));
+            if (userService.getUserByEmail(request.getEmail()).isPresent()){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.EMAIL_EXISTS));
+            }
+            u.setEmail(request.getEmail());
+        }
+        if (request.getUsername()!=null){
+            if (userService.getUserByUsername(request.getUsername()).isPresent()){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.USERNAME_EXISTS));
+            }
+            u.setUsername(request.getUsername());
         }
         if (request.getFirstName()!=null) u.setFirstName(request.getFirstName());
         if (request.getLastName()!=null) u.setLastName(request.getLastName());

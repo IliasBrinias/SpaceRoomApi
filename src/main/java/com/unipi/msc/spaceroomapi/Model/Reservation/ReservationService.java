@@ -19,4 +19,8 @@ public class ReservationService {
     public List<Reservation> getHouseReservation(House h) {
         return reservationRepository.findAllByHouseAndStatusOrderByDateFromAsc(h, ReservationStatus.SUCCESS);
     }
+    public boolean isAvailable(House h,Long from, Long to) {
+        List<Reservation> reservations = reservationRepository.findAllByHouseAndDateFromIsGreaterThanEqualAndDateToIsLessThanEqual(h,from, to);
+        return reservations.isEmpty();
+    }
 }

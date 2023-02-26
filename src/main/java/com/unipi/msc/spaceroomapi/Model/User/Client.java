@@ -22,7 +22,7 @@ public class Client extends User{
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Reservation> reservations = new ArrayList<>();
-    public Client(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
+    public Client(String email, String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         super(email, username, password, role, gender, firstName, lastName, birthday);
     }
 }

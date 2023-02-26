@@ -33,10 +33,8 @@ public class User implements UserDetails {
     @Column
     private Long Id;
     @Column(name = "email",unique = true)
-    @NonNull
     private String email;
     @Column(name = "username",unique = true)
-    @NonNull
     private String username;
     private String password;
     @Column(insertable = false, updatable = false)
@@ -53,15 +51,15 @@ public class User implements UserDetails {
     private Long creationDate;
     @Column
     private Long birthday;
+    private Boolean isGoogleAccount = false;
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<UserDao> userDaos = new ArrayList<>();
-
-    @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "image_id")
-    private Image image;
-    public User(@NonNull String email, @NonNull String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
+    public User(String email, String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         this.email = email;
         this.username = username;
         this.password = password;

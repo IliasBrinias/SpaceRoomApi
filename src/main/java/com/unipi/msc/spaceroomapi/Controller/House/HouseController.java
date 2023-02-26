@@ -2,6 +2,7 @@ package com.unipi.msc.spaceroomapi.Controller.House;
 
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Request.HouseRequest;
+import com.unipi.msc.spaceroomapi.Controller.Request.HouseSearchRequest;
 import com.unipi.msc.spaceroomapi.Controller.Responses.HousePresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ReservationPresenter;
@@ -35,12 +36,23 @@ public class HouseController {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final ReservationService reservationService;
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllHouses(){
+    @PostMapping("/search")
+    public ResponseEntity<?> getAllHouses(@RequestBody HouseSearchRequest request){
         List<HousePresenter> housePresenters = new ArrayList<>();
-        for (House h:houseService.getHouses()){
-            housePresenters.add(HousePresenter.getHouse(h));
-        }
+        houseService.getHouses().stream()
+                .filter(h->{
+                    if (request.getDate()!=null){
+                        return reservationService.isAvailable(h,request.getDate().getFrom(),request.getDate().getTo());
+                    }
+                    return true;
+                })
+                .filter(h->{
+                    if (request.getLocation()!=null){
+                        return h.getLocation().contains(request.getLocation());
+                    }
+                    return true;
+                })
+                .forEach(h->housePresenters.add(HousePresenter.getHouse(h)));
         return ResponseEntity.ok(housePresenters);
     }
     @GetMapping
@@ -65,7 +77,7 @@ public class HouseController {
         return ResponseEntity.ok(HousePresenter.getHouseWithReservationDates(h,reservations));
     }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addHouses(@ModelAttribute HouseRequest request) {
+    public ResponseEntity<?> addHouse(@ModelAttribute HouseRequest request) {
         Host host;
         try {
             host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

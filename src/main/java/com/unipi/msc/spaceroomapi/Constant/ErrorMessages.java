@@ -47,4 +47,9 @@ public class ErrorMessages {
     public static final String STATUS_NOT_VALID = "Status not valid";
     public static final String RESERVATION_NOT_FOUND = "Reservation not found";
     public static final String RESERVATION_IS_NOT_FOR_THIS_CLIENT = "Reservation is not for this client";
+    public static final String TITLE_CANT_BE_EMPTY = "Title cannot be empty";
+    public static final String DESCRIPTION_CANNOT_BE_EMPTY = "Description cannot be empty";
+    public static final String BODY_CANNOT_BE_EMPTY = "Body cannot be empty";
+    public static final String LOCATION_IS_OBLIGATORY = "Location is obligatory";
+    public static final String LOCATION_CANT_BE_EMPTY = "Location cannot be empty";
 }

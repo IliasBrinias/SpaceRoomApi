@@ -14,8 +14,4 @@ public class RegisterRequest {
     @NonNull
     private String password;
     private String role;
-    private String gender;
-    private String firstName;
-    private String lastName;
-    private Long birthday;
 }

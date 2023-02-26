@@ -18,6 +18,7 @@ public class HousePresenter {
     private Long hostId;
     private String title;
     private String description;
+    private String location;
     private Integer maxCapacity;
     private Double price;
     private List<ImagePresenter> images = new ArrayList<>();
@@ -34,6 +35,7 @@ public class HousePresenter {
         return HousePresenter.builder()
                 .Id(h.getId())
                 .hostId(h.getHost().getId())
+                .location(h.getLocation())
                 .description(h.getDescription())
                 .maxCapacity(h.getMaxCapacity())
                 .price(h.getPrice())

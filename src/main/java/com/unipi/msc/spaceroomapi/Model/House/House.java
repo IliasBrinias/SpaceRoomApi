@@ -22,6 +22,7 @@ public class House {
     @GeneratedValue
     private Long Id;
     private String title;
+    private String location;
     private String description;
     private Integer maxCapacity;
     private Double price;

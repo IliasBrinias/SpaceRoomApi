@@ -54,7 +54,8 @@ public class HouseController {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
 
-        if (request.getTitle().equals("")) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_IS_OBLIGATORY));
+        if (request.getTitle() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_IS_OBLIGATORY));
+        if (request.getLocation() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.LOCATION_IS_OBLIGATORY));
         if (request.getMaxCapacity() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.MAX_CAPACITY_IS_OBLIGATORY));
         if (request.getMaxCapacity() <= 0) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.MAX_CAPACITY_MUST_BE_GREATER_THAN_ZERO));
         if (request.getPrice() == null)return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.PRICE_IS_OBLIGATORY));
@@ -63,6 +64,7 @@ public class HouseController {
         House h = houseRepository.save(
                 House.builder()
                 .title(request.getTitle())
+                .location(request.getLocation())
                 .description(request.getDescription())
                 .maxCapacity(request.getMaxCapacity())
                 .price(request.getPrice())
@@ -72,6 +74,7 @@ public class HouseController {
         if (request.getImages()!=null){
             try {
                 for (MultipartFile image : request.getImages()) {
+                    if (image.isEmpty()) continue;
                     h.getImages().add(imageService.uploadHouseImage(image,h));
                 }
             } catch (Exception e) {
@@ -81,19 +84,42 @@ public class HouseController {
         }
         return ResponseEntity.ok(HousePresenter.getHousePresenter(h));
     }
-    @PatchMapping("{id}")
-    public ResponseEntity<?> updateHouses(@PathVariable Long id, @ModelAttribute HouseRequest request) {
+    @PatchMapping("{id}/edit")
+    public ResponseEntity<?> updateHouses(@PathVariable Long id, @RequestBody HouseRequest request) {
         Host host;
         try {
             host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException ignore){
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
         }
+        if (request.getTitle() == null &&
+            request.getDescription() == null &&
+            request.getMaxCapacity() == null &&
+            request.getPrice() == null &&
+            request.getImages() == null){
+
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.BODY_CANNOT_BE_EMPTY));
+        }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
         if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
-        if (!request.getTitle().equals("")) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_IS_OBLIGATORY));
+        if (request.getTitle() != null){
+            if (request.getTitle().equals("")) {
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_CANT_BE_EMPTY));
+            }
+            h.setTitle(request.getTitle());
+        }
+        if (request.getLocation() != null){
+            if (request.getLocation().equals("")) {
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.LOCATION_CANT_BE_EMPTY));
+            }
+            h.setLocation(request.getLocation());
+        }
+        if (request.getDescription() != null){
+            if (request.getDescription().equals("")) {
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.DESCRIPTION_CANNOT_BE_EMPTY));
+            }
+            h.setDescription(request.getDescription());
         }
         if (request.getMaxCapacity() != null) {
             if (request.getMaxCapacity() > 0) h.setMaxCapacity(request.getMaxCapacity());

@@ -32,6 +32,7 @@ public class SecurityConfiguration {
                         "/image/**").permitAll()
                 .requestMatchers("/auth/logout",
                                  "/house/*/image/*,",
+                                 "/house/*/edit,",
                                  "/house/*/image").authenticated()
                 .anyRequest()
                 .authenticated()
@@ -43,8 +44,6 @@ public class SecurityConfiguration {
                     JSONObject jsonObject = new JSONObject();
                     if (authException.getLocalizedMessage().equals("Bad credentials")){
                         jsonObject.put("error", ErrorMessages.USER_NOT_FOUND);
-                    }else if (authException.getLocalizedMessage().equals("User is disabled")) {
-                        jsonObject.put("error", ErrorMessages.USER_IS_DISABLE);
                     }else {
                         jsonObject.put("timestamp", new Date());
                         jsonObject.put("status", 403);

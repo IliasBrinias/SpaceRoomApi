@@ -38,25 +38,17 @@ public class AuthenticationService {
         if (request.getUsername().equals("") || request.getEmail().equals("") || request.getPassword().equals("")) {
             return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.FILL_ALL_THE_FIELDS));
         }
-
         // check if the user exists
         String error_msg = checkIfExist(request);
         if (!error_msg.equals("")) return ResponseEntity.badRequest().body(new ErrorResponse(false,error_msg));
 
-
         Role role;
         Gender gender;
         try {
-            role = Role.valueOf(request.getRole());
-        } catch (IllegalArgumentException ex) {
+            role = Role.valueOf(request.getRole().toUpperCase());
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_DOESNT_EXIST));
         }
-        try {
-            gender = Gender.valueOf(request.getGender());
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_DOESNT_EXIST));
-        }
-
         // build user object and save it
         User user;
         if (role == Role.CLIENT){
@@ -64,20 +56,21 @@ public class AuthenticationService {
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
                     role,
-                    gender,
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getBirthday());
+                    Gender.OTHER,
+                    null,
+                    null,
+                    null
+            );
         }
         else if (role==Role.HOST){
             user = new Host(request.getEmail(),
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
                     role,
-                    gender,
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getBirthday()
+                    Gender.OTHER,
+                    null,
+                    null,
+                    null
             );
         }
         else if (role==Role.ADMIN){
@@ -85,10 +78,11 @@ public class AuthenticationService {
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
                     role,
-                    gender,
-                    request.getFirstName(),
-                    request.getLastName(),
-                    request.getBirthday());
+                    Gender.OTHER,
+                    null,
+                    null,
+                    null
+            );
         }else {
             return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_IS_NULL));
         }

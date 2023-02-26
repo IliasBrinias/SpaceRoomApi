@@ -14,6 +14,7 @@ import java.util.List;
 public class HouseRequest {
     String title;
     String description;
+    String location;
     Integer maxCapacity;
     Double price;
     List<MultipartFile> images;

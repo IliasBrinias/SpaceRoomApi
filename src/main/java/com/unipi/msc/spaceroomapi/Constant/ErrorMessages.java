@@ -54,4 +54,5 @@ public class ErrorMessages {
     public static final String LOCATION_CANT_BE_EMPTY = "Location cannot be empty";
     public static final String NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION = "Not authorized to reject this reservation";
     public static final String EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT = "Email cannot change because is an google account";
+    public static final String EMAIL_AND_USERNAME_ARE_NULL = "Email and Username are null";
 }

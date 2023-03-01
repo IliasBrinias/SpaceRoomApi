@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @DiscriminatorValue(value = "CLIENT")
 public class Client extends User{
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Reservation> reservations = new ArrayList<>();
     public Client(String email, String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {

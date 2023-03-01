@@ -41,16 +41,12 @@ public class HouseController {
         List<HousePresenter> housePresenters = new ArrayList<>();
         houseService.getHouses().stream()
                 .filter(h->{
-                    if (request.getDate()!=null){
-                        return reservationService.isAvailable(h,request.getDate().getFrom(),request.getDate().getTo());
-                    }
-                    return true;
+                    if (request.getDate() == null) return true;
+                    return reservationService.isAvailable(h,request.getDate().getFrom(),request.getDate().getTo());
                 })
                 .filter(h->{
-                    if (request.getLocation()!=null){
-                        return h.getLocation().contains(request.getLocation());
-                    }
-                    return true;
+                    if (request.getLocation()==null) return true;
+                    return h.getLocation().contains(request.getLocation());
                 })
                 .forEach(h->housePresenters.add(HousePresenter.getHouse(h)));
         return ResponseEntity.ok(housePresenters);

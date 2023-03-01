@@ -40,7 +40,7 @@ public class AuthenticationService {
         }
         // check if the user exists
         String error_msg = checkIfExist(request);
-        if (!error_msg.equals("")) return ResponseEntity.badRequest().body(new ErrorResponse(false,error_msg));
+        if (error_msg!=null) return ResponseEntity.badRequest().body(new ErrorResponse(false,error_msg));
 
         Role role;
         try {
@@ -97,13 +97,7 @@ public class AuthenticationService {
         user.setCreationDate(new Date().getTime());
         user = userRepository.save(user);
 
-        String generatedToken = jwtService.generateToken(user);
-        userDaoRepository.save(UserDao.builder()
-                .token(generatedToken)
-                .created(new Date().getTime())
-                .user(user)
-                .isActive(true)
-                .build());
+        String generatedToken = generateToken(user);
 
         return ResponseEntity.ok(getAuthenticationResponse(user, generatedToken));
     }
@@ -112,8 +106,22 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         if (user == null) user = userRepository.findByEmail(request.getUsername()).orElse(null);
         if (user == null) return  ResponseEntity.notFound().build();
-        return ResponseEntity.ok(getAuthenticationResponse(user, jwtService.generateToken(user)));
+        String token = generateToken(user);
+        return ResponseEntity.ok(getAuthenticationResponse(user, token));
     }
+
+    private String generateToken(User user) {
+        String generatedToken = jwtService.generateToken(user);
+        userDaoService.disableOldUsersToken(user);
+        userDaoRepository.save(UserDao.builder()
+                .token(generatedToken)
+                .created(new Date().getTime())
+                .user(user)
+                .isActive(true)
+                .build());
+        return generatedToken;
+    }
+
     public UserPresenter getAuthenticationResponse(User user, String jwtToken) {
         UserPresenter response = UserPresenter.builder()
                 .id(user.getId())
@@ -126,27 +134,27 @@ public class AuthenticationService {
                 .gender(user.getGender())
                 .birthday(user.getBirthday())
                 .token(jwtToken).build();
-        if (user instanceof Client){
-            Client c = (Client) user;
-        }
-        if (user instanceof Host){
-            Host d = (Host) user;
-        }
         if (user.getImage()!=null){
             response.setImage(ImagePresenter.builder()
-                            .link("/image/"+user.getImage().getId())
-                            .id(user.getImage().getId())
-                    .build());
+                    .link("/image/"+user.getImage().getId())
+                    .id(user.getImage().getId())
+                .build());
         }
         return response;
     }
     public String checkIfExist(RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ErrorMessages.USERNAME_EXISTS;
-        }else if (userRepository.findByEmail(request.getEmail()).isPresent()){
-            return ErrorMessages.EMAIL_EXISTS;
+        if (request.getUsername()==null && request.getEmail()==null) return ErrorMessages.EMAIL_AND_USERNAME_ARE_NULL;
+        if (request.getUsername()!=null){
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                return ErrorMessages.USERNAME_EXISTS;
+            }
         }
-        return "";
+        if (request.getEmail() != null){
+            if (userRepository.findByEmail(request.getEmail()).isPresent()){
+                return ErrorMessages.EMAIL_EXISTS;
+            }
+        }
+        return null;
     }
     public ResponseEntity<?> logout() {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -162,11 +170,13 @@ public class AuthenticationService {
             return authenticate(LoginRequest.builder()
                     .username(request.getEmail())
                     .password(request.getPassword())
+                    .role(request.getRole())
                     .build());
         }
         return register(RegisterRequest.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .role(request.getRole())
                 .build(), true);
     }
 }

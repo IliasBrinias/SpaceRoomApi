@@ -23,4 +23,8 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAllByHouseAndDateFromIsGreaterThanEqualAndDateToIsLessThanEqual(h,from, to);
         return reservations.isEmpty();
     }
+
+    public List<Reservation> getHousesReservation(List<House> houses) {
+        return reservationRepository.findAllByHouseInOrderByDateFromAsc(houses);
+    }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @DiscriminatorValue(value = "HOST")
 public class Host extends User{
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<House> houses = new ArrayList<>();
     public Host(String email, String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {

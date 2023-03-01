@@ -20,24 +20,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/reservation")
 @RequiredArgsConstructor
 public class ReservationController {
     private final ReservationRepository reservationRepository;
     private final ReservationService reservationService;
     private final HouseService houseService;
-    @PostMapping
-    public ResponseEntity<?> reservation(@RequestBody ReservationRequest request) {
+    @PostMapping("/house/{houseId}/reservation")
+    public ResponseEntity<?> reservation(@RequestBody ReservationRequest request, @PathVariable Long houseId) {
         Client client;
         try {
             client = (Client) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         }catch (ClassCastException e){
             return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.USER_MUST_BE_CLIENT));
         }
-        if (request.getHouseId() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.HOUSE_ID_IS_OBLIGATORY));
+        if (houseId == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.HOUSE_ID_IS_OBLIGATORY));
         if (request.getPrice() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.PRICE_IS_OBLIGATORY));
         if (request.getDate() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.DATE_IS_OBLIGATORY));
-        House h = houseService.getHouse(request.getHouseId()).orElse(null);
+        House h = houseService.getHouse(houseId).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.HOUSE_NOT_FOUND));
 
         Reservation reservation = Reservation.builder()
@@ -51,7 +50,7 @@ public class ReservationController {
         reservation = reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
-    @PostMapping("{id}/reject")
+    @PostMapping("/reservation/{id}/reject")
     public ResponseEntity<?> rejectReservation(@PathVariable Long id) {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Reservation reservation = reservationService.getReservationWithId(id).orElse(null);

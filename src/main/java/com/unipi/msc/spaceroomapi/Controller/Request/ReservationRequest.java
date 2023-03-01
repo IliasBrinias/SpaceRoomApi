@@ -10,5 +10,4 @@ import lombok.*;
 public class ReservationRequest {
     private Double price;
     private DateRange date;
-    private Long houseId;
 }

@@ -4,20 +4,25 @@ import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Auth.AuthenticationService;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Request.UserRequest;
+import com.unipi.msc.spaceroomapi.Controller.Responses.UserReservationPresenter;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
+import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
+import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
+import com.unipi.msc.spaceroomapi.Model.User.*;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
 import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
-import com.unipi.msc.spaceroomapi.Model.User.User;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDao;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDaoService;
-import com.unipi.msc.spaceroomapi.Model.User.UserRepository;
-import com.unipi.msc.spaceroomapi.Model.User.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.mediatype.hal.forms.HalFormsOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -27,6 +32,7 @@ public class UserController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
     private final ImageService imageService;
+    private final ReservationService reservationService;
     private final ImageRepository imageRepository;
     private final UserDaoService userDaoService;
     @GetMapping
@@ -97,5 +103,16 @@ public class UserController {
         u.setImage(null);
         userRepository.save(u);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/reservation")
+    public ResponseEntity<?> getUserReservation() {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Reservation> reservationList = new ArrayList<>();
+        if (u instanceof Client){
+            reservationList = ((Client) u).getReservations();
+        }else if(u instanceof Host){
+            reservationList = reservationService.getHousesReservation(((Host) u).getHouses());
+        }
+        return ResponseEntity.ok(UserReservationPresenter.getReservationPresenter(reservationList));
     }
 }

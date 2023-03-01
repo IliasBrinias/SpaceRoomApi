@@ -26,7 +26,7 @@ public class House {
     private String description;
     private Integer maxCapacity;
     private Double price;
-    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Image> images = new ArrayList<>();
     @JsonIgnore

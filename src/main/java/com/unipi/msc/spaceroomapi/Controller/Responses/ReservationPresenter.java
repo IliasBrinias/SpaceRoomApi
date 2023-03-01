@@ -25,7 +25,7 @@ public class ReservationPresenter {
                         .from(r.getDateFrom())
                         .to(r.getDateTo())
                         .build())
-                .status(ReservationStatus.SUCCESS)
+                .status(r.getStatus())
                 .clientId(r.getClient().getId())
                 .houseId(r.getHouse().getId())
                 .build();

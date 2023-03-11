@@ -6,10 +6,11 @@ import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ReservationPresenter;
 import com.unipi.msc.spaceroomapi.Model.House.House;
 import com.unipi.msc.spaceroomapi.Model.House.HouseService;
-import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
+import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
+import com.unipi.msc.spaceroomapi.Model.User.Admin;
 import com.unipi.msc.spaceroomapi.Model.User.Client;
 import com.unipi.msc.spaceroomapi.Model.User.User;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -25,6 +28,16 @@ public class ReservationController {
     private final ReservationRepository reservationRepository;
     private final ReservationService reservationService;
     private final HouseService houseService;
+    @GetMapping("reservation/all")
+    public ResponseEntity<?> getAllReservations() {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
+        List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
+        for (Reservation reservation:reservationService.getAllReservations()){
+            reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
+        }
+        return ResponseEntity.ok(reservationPresenterList);
+    }
     @PostMapping("/house/{houseId}/reservation")
     public ResponseEntity<?> reservation(@RequestBody ReservationRequest request, @PathVariable Long houseId) {
         Client client;

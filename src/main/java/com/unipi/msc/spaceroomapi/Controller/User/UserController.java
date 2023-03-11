@@ -4,18 +4,18 @@ import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Auth.AuthenticationService;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Request.UserRequest;
+import com.unipi.msc.spaceroomapi.Controller.Responses.UserPresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.UserReservationPresenter;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
 import com.unipi.msc.spaceroomapi.Model.User.*;
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
+import com.unipi.msc.spaceroomapi.Model.Enum.Gender;
+import com.unipi.msc.spaceroomapi.Model.Enum.Role;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDao;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDaoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.mediatype.hal.forms.HalFormsOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +42,16 @@ public class UserController {
         UserDao userDao = userDaoService.getLastToken(u).orElse(null);
         if (userDao != null) token = userDao.getToken();
         return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u,token));
+    }
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUser(){
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
+        List<UserPresenter> userPresenters = new ArrayList<>();
+        for (User user:userService.getAllUsers()) {
+            userPresenters.add(UserPresenter.getUser(user));
+        }
+        return ResponseEntity.ok(userPresenters);
     }
     @PatchMapping
     public ResponseEntity<?> updateUser(@RequestBody UserRequest request) {

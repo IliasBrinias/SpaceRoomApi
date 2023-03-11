@@ -1,6 +1,6 @@
 package com.unipi.msc.spaceroomapi.Model.User;
 
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
+import com.unipi.msc.spaceroomapi.Model.Enum.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +22,9 @@ public class UserService {
 
     public Optional<User> getUser(Long id) {
         return userRepository.findAllByIdIs(id);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

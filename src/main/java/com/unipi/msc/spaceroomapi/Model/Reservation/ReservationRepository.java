@@ -1,7 +1,7 @@
 package com.unipi.msc.spaceroomapi.Model.Reservation;
 
 import com.unipi.msc.spaceroomapi.Model.House.House;
-import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
+import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +15,5 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
     List<Reservation> findAllByHouseAndStatusOrderByDateFromAsc(House house, ReservationStatus status);
     List<Reservation> findAllByHouseAndDateFromIsGreaterThanEqualAndDateToIsLessThanEqual(House house, Long dateFrom, Long dateTo);
     List<Reservation> findAllByHouseInOrderByDateFromAsc(Collection<House> house);
+    List<Reservation> findAllByOrderByDateFromAsc();
 }

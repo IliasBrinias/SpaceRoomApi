@@ -1,7 +1,7 @@
 package com.unipi.msc.spaceroomapi.Controller.Responses;
 
 import com.unipi.msc.spaceroomapi.Controller.Request.DateRange;
-import com.unipi.msc.spaceroomapi.Model.Reservation.Enum.ReservationStatus;
+import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import lombok.*;
 

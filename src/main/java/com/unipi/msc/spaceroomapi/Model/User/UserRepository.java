@@ -1,6 +1,6 @@
 package com.unipi.msc.spaceroomapi.Model.User;
 
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
+import com.unipi.msc.spaceroomapi.Model.Enum.Role;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +12,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     List<User> findAllByRoleNot(@NonNull Role role);
+    List<User> findAll();
     Optional<User> findAllByIdIs(Long id);
+
 }

@@ -1,6 +1,7 @@
 package com.unipi.msc.spaceroomapi.config;
 
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
+import com.unipi.msc.spaceroomapi.Model.Enum.Role;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +35,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/auth/logout",
                                  "/house/*/image/*,",
                                  "/house/*/edit,",
-                                 "/house/*/image").authenticated()
+                                 "/house/*/image",
+                                 "/user/all",
+                                 "reservation/all").authenticated()
                 .anyRequest()
                 .authenticated()
                 .and()

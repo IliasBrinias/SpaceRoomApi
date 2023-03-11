@@ -1,7 +1,7 @@
 package com.unipi.msc.spaceroomapi.Model.User;
 
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Gender;
-import com.unipi.msc.spaceroomapi.Model.User.Enum.Role;
+import com.unipi.msc.spaceroomapi.Model.Enum.Gender;
+import com.unipi.msc.spaceroomapi.Model.Enum.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

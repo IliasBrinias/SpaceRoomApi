@@ -1,4 +1,4 @@
-package com.unipi.msc.spaceroomapi.Model.User.Enum;
+package com.unipi.msc.spaceroomapi.Model.Enum;
 
 public enum Role {
     USER,

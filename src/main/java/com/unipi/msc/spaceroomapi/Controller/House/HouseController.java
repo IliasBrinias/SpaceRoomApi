@@ -14,7 +14,9 @@ import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
+import com.unipi.msc.spaceroomapi.Model.User.Admin;
 import com.unipi.msc.spaceroomapi.Model.User.Host;
+import com.unipi.msc.spaceroomapi.Model.User.User;
 import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -113,11 +115,14 @@ public class HouseController {
     }
     @PatchMapping("{id}/edit")
     public ResponseEntity<?> updateHouses(@PathVariable Long id, @RequestBody HouseRequest request) {
-        Host host;
+        Host host = null;
         try {
-            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!(u instanceof Admin)){
+                host = (Host) u;
+            }
         }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST_OR_ADMIN));
         }
         if (request.getTitle() == null &&
             request.getDescription() == null &&
@@ -129,7 +134,10 @@ public class HouseController {
         }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
+        if (host != null) {
+            if (!h.getHost().getId().equals(host.getId()))
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
+        }
         if (request.getTitle() != null){
             if (request.getTitle().equals("")) {
                 return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.TITLE_CANT_BE_EMPTY));

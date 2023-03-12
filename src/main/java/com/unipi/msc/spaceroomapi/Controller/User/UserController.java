@@ -56,43 +56,7 @@ public class UserController {
     @PatchMapping
     public ResponseEntity<?> updateUser(@RequestBody UserRequest request) {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Gender gender;
-        try {
-            gender = Gender.valueOf(request.getGender().toUpperCase());
-            u.setGender(gender);
-        }catch (Exception ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.GENDER_NOT_VALID));
-        }
-        if (request.getEmail()!=null){
-            if (u.getIsGoogleAccount()) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT));
-            if (userService.getUserByEmail(request.getEmail()).isPresent()){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.EMAIL_EXISTS));
-            }
-            u.setEmail(request.getEmail());
-        }
-        if (request.getUsername()!=null){
-            if (userService.getUserByUsername(request.getUsername()).isPresent()){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.USERNAME_EXISTS));
-            }
-            u.setUsername(request.getUsername());
-        }
-        if (request.getFirstName()!=null) u.setFirstName(request.getFirstName());
-        if (request.getLastName()!=null) u.setLastName(request.getLastName());
-        if (request.getBirthday()!=null) u.setBirthday(request.getBirthday());
-        if (u.getRole() == Role.USER && request.getRole()!=null){
-            Role role;
-            try {
-                role = Role.valueOf(request.getRole().toUpperCase());
-            }catch (Exception ignore){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ROLE_DOESNT_EXIST));
-            }
-            u.setRole(role);
-        }
-        String token = null;
-        UserDao userDao = userDaoService.getLastToken(u).orElse(null);
-        if (userDao != null) token = userDao.getToken();
-        u = userRepository.save(u);
-        return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u,token));
+        return userService.updateUserDetails(request, u);
     }
     @PatchMapping("/image")
     public ResponseEntity<?> updateUserImage(@RequestParam("image") MultipartFile newImg) {
@@ -113,6 +77,25 @@ public class UserController {
         u.setImage(null);
         userRepository.save(u);
         return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Admin)) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED));
+        }
+        User u = userService.getUser(id).orElse(null);
+        if (u == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.USER_NOT_FOUND));
+        userRepository.delete(u);
+        return ResponseEntity.ok().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateUserById(@RequestBody UserRequest request, @PathVariable Long id) {
+        if (!(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Admin)) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED));
+        }
+        User u = userService.getUser(id).orElse(null);
+        if (u == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.USER_NOT_FOUND));
+        return userService.updateUserDetails(request, u);
     }
     @GetMapping("/reservation")
     public ResponseEntity<?> getUserReservation() {

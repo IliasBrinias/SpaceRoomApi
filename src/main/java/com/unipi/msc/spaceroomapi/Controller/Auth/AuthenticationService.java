@@ -86,7 +86,7 @@ public class AuthenticationService {
             user = new User(request.getEmail(),
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
-                    Role.USER,
+                    role.USER,
                     Gender.OTHER,
                     null,
                     null,

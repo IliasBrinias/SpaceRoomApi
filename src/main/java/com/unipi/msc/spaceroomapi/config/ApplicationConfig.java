@@ -3,6 +3,7 @@ package com.unipi.msc.spaceroomapi.config;
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Model.User.User;
 import com.unipi.msc.spaceroomapi.Model.User.UserRepository;
+import com.unipi.msc.spaceroomapi.Model.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,16 +24,17 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> {
-            User user = userRepository.findByUsername(username)
-                    .orElse(null);
-            if (user == null){
-                user = userRepository.findByEmail(username)
-                        .orElse(null);
+            try {
+                User user = userRepository.findByUsernameOrEmail(username,username).orElse(null);
+                if (user == null){
+                    throw new UsernameNotFoundException(ErrorMessages.USER_NOT_FOUND);
+                }
+                return user;
+            }catch (Exception e){
+                e.printStackTrace();
+                return null;
             }
-            if (user == null){
-                throw new UsernameNotFoundException(ErrorMessages.USER_NOT_FOUND);
-            }
-            return user;
+
         };
     }
     @Bean

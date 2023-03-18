@@ -86,4 +86,13 @@ public class ReservationController {
         }
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
+    @DeleteMapping("reservation/{id}")
+    public ResponseEntity<?> deleteReservation(@PathVariable Long id){
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.NOT_AUTHORIZED));
+        Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
+        if (reservation == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_NOT_FOUND));
+        reservationRepository.delete(reservation);
+        return ResponseEntity.ok().build();
+    }
 }

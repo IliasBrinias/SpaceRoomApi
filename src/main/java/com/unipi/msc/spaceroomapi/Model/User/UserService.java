@@ -38,6 +38,14 @@ public class UserService {
         return userRepository.findAll();
     }
     public ResponseEntity<?> updateUserDetails(UserRequest request, User u) {
+        if (request.getUsername() == null &&
+                request.getGender() == null &&
+                request.getBirthday() == null &&
+                request.getEmail() == null &&
+                request.getFirstName() == null &&
+                request.getLastName() == null){
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.BODY_CANNOT_BE_EMPTY));
+        }
         Gender gender;
         try {
             gender = Gender.valueOf(request.getGender().toUpperCase());
@@ -46,30 +54,36 @@ public class UserService {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.GENDER_NOT_VALID));
         }
         if (request.getEmail()!=null){
-            if (u.getIsGoogleAccount())
-                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT));
-            if (getUserByEmail(request.getEmail()).isPresent()){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.EMAIL_EXISTS));
+            if (!request.getEmail().equals(u.getEmail())){
+                if (u.getIsGoogleAccount())
+                    return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT));
+                if (getUserByEmail(request.getEmail()).isPresent()){
+                    return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.EMAIL_EXISTS));
+                }
+                u.setEmail(request.getEmail());
             }
-            u.setEmail(request.getEmail());
         }
         if (request.getUsername()!=null){
-            if (getUserByUsername(request.getUsername()).isPresent()){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USERNAME_EXISTS));
+            if (!request.getUsername().equals(u.getUsername())){
+                if (getUserByUsername(request.getUsername()).isPresent()){
+                    return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USERNAME_EXISTS));
+                }
+                u.setUsername(request.getUsername());
             }
-            u.setUsername(request.getUsername());
         }
-        if (request.getFirstName()!=null) u.setFirstName(request.getFirstName());
-        if (request.getLastName()!=null) u.setLastName(request.getLastName());
-        if (request.getBirthday()!=null) u.setBirthday(request.getBirthday());
-        if (u.getRole() == Role.USER && request.getRole()!=null){
-            Role role;
-            try {
-                role = Role.valueOf(request.getRole().toUpperCase());
-            }catch (Exception ignore){
-                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ROLE_DOESNT_EXIST));
+        if (request.getFirstName()!=null) {
+            if (request.getFirstName().equals(u.getFirstName()))
+            u.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName()!=null) {
+            if (!request.getLastName().equals(u.getLastName())){
+                u.setLastName(request.getLastName());
             }
-            u.setRole(role);
+        }
+        if (request.getBirthday()!=null) {
+            if (request.getBirthday() != u.getBirthday()) {
+                u.setBirthday(request.getBirthday());
+            }
         }
         String token = null;
         UserDao userDao = userDaoService.getLastToken(u).orElse(null);

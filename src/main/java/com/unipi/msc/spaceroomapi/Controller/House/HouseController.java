@@ -129,7 +129,6 @@ public class HouseController {
             request.getMaxCapacity() == null &&
             request.getPrice() == null &&
             request.getImages() == null){
-
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.BODY_CANNOT_BE_EMPTY));
         }
         House h = houseService.getHouse(id).orElse(null);

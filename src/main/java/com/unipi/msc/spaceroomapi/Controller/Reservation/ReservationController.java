@@ -1,5 +1,6 @@
 package com.unipi.msc.spaceroomapi.Controller.Reservation;
 
+import com.google.zxing.WriterException;
 import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Request.ReservationRequest;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
@@ -12,13 +13,19 @@ import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
 import com.unipi.msc.spaceroomapi.Model.User.Admin;
 import com.unipi.msc.spaceroomapi.Model.User.Client;
+import com.unipi.msc.spaceroomapi.Model.User.Host;
 import com.unipi.msc.spaceroomapi.Model.User.User;
-import com.unipi.msc.spaceroomapi.Shared.Email;
+import com.unipi.msc.spaceroomapi.Shared.EmailSender;
+import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
+import com.unipi.msc.spaceroomapi.Shared.QRGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -30,12 +37,27 @@ public class ReservationController {
     @GetMapping("reservation/all")
     public ResponseEntity<?> getAllReservations() {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
         List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
-        for (Reservation reservation:reservationService.getAllReservations()){
-            reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
+        if (u instanceof Host){
+            for (Reservation reservation:reservationService.getHostReservations((Host) u)){
+                reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
+            }
+            return ResponseEntity.ok(reservationPresenterList);
+        }else if (u instanceof Admin) {
+            for (Reservation reservation : reservationService.getAllReservations()) {
+                reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
+            }
+        }else {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
         }
         return ResponseEntity.ok(reservationPresenterList);
+    }
+    @GetMapping("reservation/{id}/qr")
+    public ResponseEntity<?> getReservationQr(@PathVariable Long id) throws IOException, WriterException {
+        Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
+        if (reservation == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_NOT_FOUND));
+        byte[] img = QRGenerator.getQRCodeImage(reservation.getId().toString());
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_PNG).body(img);
     }
     @PostMapping("/house/{houseId}/reservation")
     public ResponseEntity<?> reservation(@RequestBody ReservationRequest request, @PathVariable Long houseId) {
@@ -62,7 +84,7 @@ public class ReservationController {
                 .status(ReservationStatus.SUCCESS)
                 .build();
         reservation = reservationRepository.save(reservation);
-        Email.sendAcceptReservation(client.getEmail(), reservation);
+        EmailSender.sendAcceptReservation(client.getEmail(), reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/reject")
@@ -78,7 +100,7 @@ public class ReservationController {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
         }
         reservation = reservationRepository.save(reservation);
-        Email.sendRejectReservation(u.getEmail(), reservation);
+        EmailSender.sendRejectReservation(u.getEmail(), reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/check-in")

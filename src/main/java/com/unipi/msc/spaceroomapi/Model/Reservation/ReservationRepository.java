@@ -16,4 +16,5 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
     List<Reservation> findAllByHouseAndDateFromIsGreaterThanEqualAndDateToIsLessThanEqual(House house, Long dateFrom, Long dateTo);
     List<Reservation> findAllByHouseInOrderByDateFromAsc(Collection<House> house);
     List<Reservation> findAllByOrderByDateFromAsc();
+    List<Reservation> findAllByHouseIn(Collection<House> house);
 }

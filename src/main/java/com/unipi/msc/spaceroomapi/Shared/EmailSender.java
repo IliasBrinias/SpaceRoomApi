@@ -1,20 +1,26 @@
 package com.unipi.msc.spaceroomapi.Shared;
 
+import com.google.zxing.WriterException;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.asynchttpclient.Response;
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
-public class Email {
+public class EmailSender {
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     private static final String HTML_PATH = System.getProperty("user.dir")+"/src/main/java/com/unipi/msc/spaceroomapi/Shared/EmailTemplate/";
     private static void send(String emailTo, String subject, String body){
         AsyncHttpClient client = new DefaultAsyncHttpClient();
@@ -59,25 +65,26 @@ public class Email {
 
     }
     public static void sendAcceptReservation(String emailTo, Reservation r){
-
-        // Read the HTML file in String
-        String body;
         try {
-            body = readFileContent( HTML_PATH+"AcceptReservation.html", StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            return;
+            Document doc = Jsoup.parse( new File(HTML_PATH+"AcceptReservation.html"));
+            doc.body().getElementById("client-name").attr("value",r.getClient().getFirstName()+" "+r.getClient().getLastName());
+            doc.body().getElementById("house-title").attr("value",r.getHouse().getTitle());
+            doc.body().getElementById("price").attr("value",r.getHouse().getPrice().toString());
+            doc.body().getElementById("location").attr("value",r.getHouse().getLocation());
+            doc.body().getElementById("num-guests").attr("value",r.getHouse().getMaxCapacity().toString());
+            doc.body().getElementById("check-in").attr("value",dateFormat.format(r.getDateFrom()));
+            doc.body().getElementById("check-out").attr("value",dateFormat.format(r.getDateTo()));
+            send(emailTo,"RESERVATION ACCEPTED", doc.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        send(emailTo, "RESERVATION ACCEPTED", body);
-
     }
     public static void sendRejectReservation(String emailTo, Reservation r){
-        // Read the HTML file in String
         String body;
         try {
-            body = readFileContent( HTML_PATH+"RejectReservation.html", StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            exception.printStackTrace();
+            body = readFileContent(HTML_PATH+"RejectReservation.html", StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
             return;
         }
         send(emailTo, "RESERVATION REJECTED", body);

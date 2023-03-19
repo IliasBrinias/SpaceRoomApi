@@ -17,10 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Date;
 
 @Service
@@ -111,7 +114,16 @@ public class AuthenticationService {
     }
 
     public String generateToken(User user) {
-        String generatedToken = jwtService.generateToken(user);
+        String generatedToken = jwtService.generateToken(new User(){
+            @Override
+            public String getUsername() {
+                if (user.getUsername()!=null){
+                    return user.getUsername();
+                }else {
+                    return user.getEmail();
+                }
+            }
+        });
         userDaoService.disableOldUsersToken(user);
         userDaoRepository.save(UserDao.builder()
                 .token(generatedToken)

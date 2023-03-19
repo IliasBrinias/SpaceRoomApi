@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
 </head>
 <body>
-<form>
-    <label for="client-name">Client Name:</label>
-    <input type="text" id="client-name" name="client-name" value="client_name"><br>
+<h3 style=" font-weight: bold; text-align: left; margin-bottom: 20px;">Reservation Completed Successfully</h3>
 
-    <label for="house-title">House Title:</label>
-    <input type="text" id="house-title" name="house-title" value="{house_title}"><br>
+<form style=" font-size: 16px; color: #333333;">
 
-    <label for="price">Price:</label>
-    <input type="text" id="price" name="price" value="{house_price} per night"><br>
+    <label style="display: block; margin-bottom: 10px;">Client Name:</label>
+    <input type="text" id="client-name" name="client-name" value="John Smith" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
 
-    <label for="location">Location:</label>
-    <input type="text" id="location" name="location" value="{house_location}"><br>
+    <label style="display: block; margin-bottom: 10px;">House Title:</label>
+    <input type="text" id="house-title" name="house-title" value="Luxury Villa in Bali" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
 
-    <label for="num-guests">Number of Guests:</label>
-    <input type="number" id="num-guests" name="num-guests" value="{house_num_guest}"><br>
+    <label style="display: block; margin-bottom: 10px;">Price:</label>
+    <input type="text" id="price" name="price" value="$500 per night" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
 
-    <label for="check-in">Check-in Date:</label>
-    <input type="date" id="check-in" name="check-in" value="{house_check_in}"><br>
+    <label style="display: block; margin-bottom: 10px;">Location:</label>
+    <input type="text" id="location" name="location" value="Seminyak, Bali" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
 
-    <label for="check-out">Check-out Date:</label>
-    <input type="date" id="check-out" name="check-out" value="{house_check_out}"><br>
+    <label style="display: block; margin-bottom: 10px;">Number of Guests:</label>
+    <input type="number" id="num-guests" name="num-guests" value="8" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
+
+    <label style="display: block; margin-bottom: 10px;">Check-in Date:</label>
+    <input type="date" id="check-in" name="check-in" value="2023-04-15" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
+
+    <label style="display: block; margin-bottom: 10px;">Check-out Date:</label>
+    <input type="date" id="check-out" name="check-out" value="2023-04-22" style="padding: 10px; border: none; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); margin-bottom: 20px;" disabled><br>
 </form>
 </body>
 </html>

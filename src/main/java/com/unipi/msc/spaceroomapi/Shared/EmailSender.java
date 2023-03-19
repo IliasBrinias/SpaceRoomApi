@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class EmailSender {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
     private static final String HTML_PATH = System.getProperty("user.dir")+"/src/main/java/com/unipi/msc/spaceroomapi/Shared/EmailTemplate/";
     private static void send(String emailTo, String subject, String body){
         AsyncHttpClient client = new DefaultAsyncHttpClient();
@@ -62,35 +61,32 @@ public class EmailSender {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
     public static void sendAcceptReservation(String emailTo, Reservation r){
         try {
-            Document doc = Jsoup.parse( new File(HTML_PATH+"AcceptReservation.html"));
-            doc.body().getElementById("client-name").attr("value",r.getClient().getFirstName()+" "+r.getClient().getLastName());
-            doc.body().getElementById("house-title").attr("value",r.getHouse().getTitle());
-            doc.body().getElementById("price").attr("value",r.getHouse().getPrice().toString());
-            doc.body().getElementById("location").attr("value",r.getHouse().getLocation());
-            doc.body().getElementById("num-guests").attr("value",r.getHouse().getMaxCapacity().toString());
-            doc.body().getElementById("check-in").attr("value",dateFormat.format(r.getDateFrom()));
-            doc.body().getElementById("check-out").attr("value",dateFormat.format(r.getDateTo()));
+            Document doc = getDocument("AcceptReservation.html",r);
             send(emailTo,"RESERVATION ACCEPTED", doc.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     public static void sendRejectReservation(String emailTo, Reservation r){
-        String body;
         try {
-            body = readFileContent(HTML_PATH+"RejectReservation.html", StandardCharsets.UTF_8);
+            Document doc = getDocument("RejectReservation.html",r);
+            send(emailTo,"RESERVATION REJECTED", doc.toString());
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
-        send(emailTo, "RESERVATION REJECTED", body);
     }
-    private static String readFileContent(String filePath, Charset encoding) throws IOException {
-        String fileContent = Files.lines(Paths.get(filePath), encoding).collect(Collectors.joining(System.lineSeparator()));
-        return fileContent;
+    private static Document getDocument(String fileName,Reservation r) throws IOException {
+        Document doc = Jsoup.parse(new File(HTML_PATH+fileName));
+        doc.body().getElementById("client-name").attr("value", r.getClient().getFirstName()+" "+ r.getClient().getLastName());
+        doc.body().getElementById("house-title").attr("value", r.getHouse().getTitle());
+        doc.body().getElementById("price").attr("value", r.getHouse().getPrice().toString());
+        doc.body().getElementById("location").attr("value", r.getHouse().getLocation());
+        doc.body().getElementById("num-guests").attr("value", r.getHouse().getMaxCapacity().toString());
+        doc.body().getElementById("check-in").attr("value",dateFormat.format(r.getDateFrom()));
+        doc.body().getElementById("check-out").attr("value",dateFormat.format(r.getDateTo()));
+        return doc;
     }
 }

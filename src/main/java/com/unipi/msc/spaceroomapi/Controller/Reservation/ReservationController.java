@@ -94,7 +94,9 @@ public class ReservationController {
                 .status(ReservationStatus.SUCCESS)
                 .build();
         reservation = reservationRepository.save(reservation);
-        EmailSender.sendAcceptReservation(client.getEmail(), reservation);
+        if (client.getEmail()!=null){
+            EmailSender.sendAcceptReservation(client.getEmail(), reservation);
+        }
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/reject")
@@ -105,12 +107,17 @@ public class ReservationController {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.RESERVATION_NOT_FOUND));
         }
         if (Objects.equals(reservation.getClient().getId(), u.getId()) || Objects.equals(reservation.getHouse().getHost().getId(), u.getId())){
+            if (reservation.getStatus() == ReservationStatus.REJECTED){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_IS_REJECTED));
+            }
             reservation.setStatus(ReservationStatus.REJECTED);
         }else {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
         }
         reservation = reservationRepository.save(reservation);
-        EmailSender.sendRejectReservation(u.getEmail(), reservation);
+        if (reservation.getClient().getEmail()!=null){
+            EmailSender.sendRejectReservation(reservation.getClient().getEmail(), reservation);
+        }
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/check-in")

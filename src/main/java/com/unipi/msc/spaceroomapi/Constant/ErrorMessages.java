@@ -56,4 +56,5 @@ public class ErrorMessages {
     public static final String EMAIL_CANNOT_CHANGE_BECAUSE_IS_AN_GOOGLE_ACCOUNT = "Email cannot change because is an google account";
     public static final String EMAIL_AND_USERNAME_ARE_NULL = "Email and Username are null";
     public static final String USER_MUST_BE_HOST_OR_ADMIN = "User must be host or admin";
+    public static final String RESERVATION_IS_REJECTED = "Reservation is rejected";
 }

@@ -82,7 +82,9 @@ public class ReservationController {
         if (request.getDate() == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.DATE_IS_OBLIGATORY));
         House h = houseService.getHouse(houseId).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.HOUSE_NOT_FOUND));
-
+        if (!reservationService.isAvailable(h,request.getDate().getFrom(),request.getDate().getTo())){
+            return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.HOUSE_IS_NOT_AVAILABLE));
+        }
         Reservation reservation = Reservation.builder()
                 .client(client)
                 .house(h)

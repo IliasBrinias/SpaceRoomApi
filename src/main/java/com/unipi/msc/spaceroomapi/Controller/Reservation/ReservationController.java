@@ -37,20 +37,30 @@ public class ReservationController {
     @GetMapping("reservation/all")
     public ResponseEntity<?> getAllReservations() {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
         if (u instanceof Host){
+            List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
             for (Reservation reservation:reservationService.getHostReservations((Host) u)){
                 reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
             }
             return ResponseEntity.ok(reservationPresenterList);
-        }else if (u instanceof Admin) {
-            for (Reservation reservation : reservationService.getAllReservations()) {
-                reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
-            }
-        }else {
-            return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
+        }
+        if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
+        List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
+        for (Reservation reservation:reservationService.getAllReservations()){
+            reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
         }
         return ResponseEntity.ok(reservationPresenterList);
+    }
+    @GetMapping("reservation")
+    public ResponseEntity<?> getReservations() {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(u instanceof Host)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.ACCESS_DENIED));
+        List<ReservationPresenter> reservationPresenterList = new ArrayList<>();
+        for (Reservation reservation:reservationService.getHostReservations((Host) u)){
+            reservationPresenterList.add(ReservationPresenter.getReservation(reservation));
+        }
+        return ResponseEntity.ok(reservationPresenterList);
+
     }
     @GetMapping("reservation/{id}/qr")
     public ResponseEntity<?> getReservationQr(@PathVariable Long id) throws IOException, WriterException {
@@ -120,7 +130,7 @@ public class ReservationController {
         reservation = reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
-    @GetMapping("{id}")
+    @GetMapping("reservation/{id}")
     public ResponseEntity<?> getReservation(@PathVariable Long id) {
         Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
         if (reservation == null) {

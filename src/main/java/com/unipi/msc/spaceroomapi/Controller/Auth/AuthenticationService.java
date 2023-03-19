@@ -105,9 +105,14 @@ public class AuthenticationService {
         return ResponseEntity.ok(getAuthenticationResponse(user, generatedToken));
     }
     public ResponseEntity<?> authenticate(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
-        if (user == null) user = userRepository.findByEmail(request.getUsername()).orElse(null);
+        User user;
+        if (request.getUsername()!=null){
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
+            user = userRepository.findByUsername(request.getUsername()).orElse(null);
+        }else {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
+            user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        }
         if (user == null) return  ResponseEntity.notFound().build();
         String token = generateToken(user);
         return ResponseEntity.ok(getAuthenticationResponse(user, token));

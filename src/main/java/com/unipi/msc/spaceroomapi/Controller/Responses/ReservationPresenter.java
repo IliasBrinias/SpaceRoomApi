@@ -19,6 +19,7 @@ public class ReservationPresenter {
     private Long houseId;
     private Long creationDate;
     private int uuid;
+    private boolean checkIn;
     public static ReservationPresenter getReservation(Reservation r){
         return ReservationPresenter.builder()
                 .Id(r.getId())
@@ -30,6 +31,7 @@ public class ReservationPresenter {
                 .creationDate(r.getCreationDate())
                 .uuid(r.getUuid())
                 .status(r.getStatus())
+                .checkIn(r.isCheckIn())
                 .clientId(r.getClient().getId())
                 .houseId(r.getHouse().getId())
                 .build();

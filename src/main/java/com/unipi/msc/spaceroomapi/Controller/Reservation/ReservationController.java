@@ -79,6 +79,23 @@ public class ReservationController {
         reservation = reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
+    @PostMapping("/reservation/{id}/check-in")
+    public ResponseEntity<?> checkIn(@PathVariable Long id) {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(u instanceof Client)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.NOT_AUTHORIZED));
+
+        Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
+        if (reservation == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.RESERVATION_NOT_FOUND));
+        }
+        if (Objects.equals(reservation.getClient().getId(), u.getId()) || Objects.equals(reservation.getHouse().getHost().getId(), u.getId())){
+            reservation.setCheckIn(true);
+        }else {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
+        }
+        reservation = reservationRepository.save(reservation);
+        return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
+    }
     @GetMapping("{id}")
     public ResponseEntity<?> getReservation(@PathVariable Long id) {
         Reservation reservation = reservationService.getReservationWithId(id).orElse(null);

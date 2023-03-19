@@ -22,6 +22,7 @@ public class Reservation {
     private ReservationStatus status;
     private Long creationDate;
     private int uuid;
+    private boolean checkIn;
     private Long dateFrom;
     private Long dateTo;
     @JsonIgnore

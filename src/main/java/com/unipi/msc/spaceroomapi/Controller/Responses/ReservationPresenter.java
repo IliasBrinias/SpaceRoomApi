@@ -20,6 +20,9 @@ public class ReservationPresenter {
     private Long creationDate;
     private int uuid;
     private boolean checkIn;
+    private String username;
+    private String houseTitle;
+
     public static ReservationPresenter getReservation(Reservation r){
         return ReservationPresenter.builder()
                 .Id(r.getId())
@@ -34,6 +37,8 @@ public class ReservationPresenter {
                 .checkIn(r.isCheckIn())
                 .clientId(r.getClient().getId())
                 .houseId(r.getHouse().getId())
+                .username(r.getClient().getUsername())
+                .houseTitle(r.getHouse().getTitle())
                 .build();
     }
 }

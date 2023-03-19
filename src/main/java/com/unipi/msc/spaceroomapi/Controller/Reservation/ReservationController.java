@@ -13,6 +13,7 @@ import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
 import com.unipi.msc.spaceroomapi.Model.User.Admin;
 import com.unipi.msc.spaceroomapi.Model.User.Client;
 import com.unipi.msc.spaceroomapi.Model.User.User;
+import com.unipi.msc.spaceroomapi.Shared.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,8 +61,8 @@ public class ReservationController {
                 .uuid(UUID.randomUUID().hashCode())
                 .status(ReservationStatus.SUCCESS)
                 .build();
-
         reservation = reservationRepository.save(reservation);
+        Email.sendAcceptReservation(client.getEmail(), reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/reject")
@@ -77,6 +78,7 @@ public class ReservationController {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
         }
         reservation = reservationRepository.save(reservation);
+        Email.sendRejectReservation(u.getEmail(), reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/check-in")

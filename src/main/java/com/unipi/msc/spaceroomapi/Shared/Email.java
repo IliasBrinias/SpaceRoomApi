@@ -1,5 +1,6 @@
 package com.unipi.msc.spaceroomapi.Shared;
 
+import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.asynchttpclient.AsyncHttpClient;
@@ -7,9 +8,15 @@ import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.Response;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 public class Email {
-    public static void send(String emailTo,String subject,String html){
+    private static final String HTML_PATH = System.getProperty("user.dir")+"/src/main/java/com/unipi/msc/spaceroomapi/Shared/EmailTemplate/";
+    private static void send(String emailTo, String subject, String body){
         AsyncHttpClient client = new DefaultAsyncHttpClient();
         try {
             JSONObject mainObject = new JSONObject();
@@ -32,7 +39,7 @@ public class Email {
             mainObject.put("from",senderObject);
 //            body
             bodyJson.put("type","text/html");
-            bodyJson.put("value",html);
+            bodyJson.put("value", body);
             bodyLineArray.add(bodyJson);
             mainObject.put("content", bodyLineArray);
 //            call
@@ -50,5 +57,33 @@ public class Email {
             throw new RuntimeException(e);
         }
 
+    }
+    public static void sendAcceptReservation(String emailTo, Reservation r){
+
+        // Read the HTML file in String
+        String body;
+        try {
+            body = readFileContent( HTML_PATH+"AcceptReservation.html", StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return;
+        }
+        send(emailTo, "RESERVATION ACCEPTED", body);
+
+    }
+    public static void sendRejectReservation(String emailTo, Reservation r){
+        // Read the HTML file in String
+        String body;
+        try {
+            body = readFileContent( HTML_PATH+"RejectReservation.html", StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return;
+        }
+        send(emailTo, "RESERVATION REJECTED", body);
+    }
+    private static String readFileContent(String filePath, Charset encoding) throws IOException {
+        String fileContent = Files.lines(Paths.get(filePath), encoding).collect(Collectors.joining(System.lineSeparator()));
+        return fileContent;
     }
 }

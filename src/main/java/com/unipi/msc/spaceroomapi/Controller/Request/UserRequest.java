@@ -13,4 +13,5 @@ public class UserRequest {
     private String firstName;
     private String lastName;
     private Long birthday;
+    private String role;
 }

@@ -17,6 +17,8 @@ public class ReservationPresenter {
     private DateRange date;
     private Long clientId;
     private Long houseId;
+    private Long creationDate;
+    private int uuid;
     public static ReservationPresenter getReservation(Reservation r){
         return ReservationPresenter.builder()
                 .Id(r.getId())
@@ -25,6 +27,8 @@ public class ReservationPresenter {
                         .from(r.getDateFrom())
                         .to(r.getDateTo())
                         .build())
+                .creationDate(r.getCreationDate())
+                .uuid(r.getUuid())
                 .status(r.getStatus())
                 .clientId(r.getClient().getId())
                 .houseId(r.getHouse().getId())

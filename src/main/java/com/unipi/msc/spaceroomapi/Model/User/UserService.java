@@ -46,12 +46,25 @@ public class UserService {
                 request.getLastName() == null){
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.BODY_CANNOT_BE_EMPTY));
         }
-        Gender gender;
-        try {
-            gender = Gender.valueOf(request.getGender().toUpperCase());
-            u.setGender(gender);
-        }catch (Exception ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.GENDER_NOT_VALID));
+        if (u.getGender()!=null){
+            Gender gender;
+            try {
+                gender = Gender.valueOf(request.getGender().toUpperCase());
+                u.setGender(gender);
+            }catch (Exception ignore){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.GENDER_NOT_VALID));
+            }
+        }
+        if (request.getRole() != null) {
+            Role role;
+            try {
+                role = Role.valueOf(request.getRole().toUpperCase());
+                if (role != Role.USER && u.getRole()==Role.USER) {
+                    u.setRole(role);
+                }
+            } catch (Exception ignore) {
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ROLE_DOESNT_EXIST));
+            }
         }
         if (request.getEmail()!=null){
             if (!request.getEmail().equals(u.getEmail())){
@@ -85,11 +98,8 @@ public class UserService {
                 u.setBirthday(request.getBirthday());
             }
         }
-        String token = null;
-        UserDao userDao = userDaoService.getLastToken(u).orElse(null);
-        if (userDao != null) token = userDao.getToken();
         u = userRepository.save(u);
-        return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u, token));
+        return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u, authenticationService.generateToken(u)));
     }
 
 }

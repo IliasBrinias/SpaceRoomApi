@@ -86,7 +86,7 @@ public class AuthenticationService {
             user = new User(request.getEmail(),
                     request.getUsername(),
                     passwordEncoder.encode(request.getPassword()),
-                    role.USER,
+                    Role.USER,
                     Gender.OTHER,
                     null,
                     null,
@@ -110,7 +110,7 @@ public class AuthenticationService {
         return ResponseEntity.ok(getAuthenticationResponse(user, token));
     }
 
-    private String generateToken(User user) {
+    public String generateToken(User user) {
         String generatedToken = jwtService.generateToken(user);
         userDaoService.disableOldUsersToken(user);
         userDaoRepository.save(UserDao.builder()

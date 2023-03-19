@@ -20,6 +20,8 @@ public class Reservation {
     private Long Id;
     private Double price;
     private ReservationStatus status;
+    private Long creationDate;
+    private int uuid;
     private Long dateFrom;
     private Long dateTo;
     @JsonIgnore

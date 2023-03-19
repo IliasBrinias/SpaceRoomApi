@@ -27,6 +27,7 @@ import java.util.Objects;
 @Table
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue(value = "USER")
 public class User implements UserDetails {
     @Id
     @GeneratedValue

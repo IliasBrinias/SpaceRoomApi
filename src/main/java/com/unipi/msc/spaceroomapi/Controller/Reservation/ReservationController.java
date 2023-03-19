@@ -18,9 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,8 +56,11 @@ public class ReservationController {
                 .price(request.getPrice())
                 .dateFrom(request.getDate().getFrom())
                 .dateTo(request.getDate().getTo())
+                .creationDate(new Date().getTime())
+                .uuid(UUID.randomUUID().hashCode())
                 .status(ReservationStatus.SUCCESS)
                 .build();
+
         reservation = reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }

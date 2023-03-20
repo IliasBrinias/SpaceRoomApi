@@ -31,6 +31,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/auth/**",
                         "/house/*",
                         "/house/*/reservation",
+                        "/reservation/*/qr",
                         "/image/**").permitAll()
                 .requestMatchers("/auth/logout",
                                  "/house/*/image/*,",

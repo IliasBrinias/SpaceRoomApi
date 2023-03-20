@@ -4,6 +4,7 @@ import com.unipi.msc.spaceroomapi.Constant.ErrorMessages;
 import com.unipi.msc.spaceroomapi.Controller.Auth.AuthenticationService;
 import com.unipi.msc.spaceroomapi.Controller.Responses.ErrorResponse;
 import com.unipi.msc.spaceroomapi.Controller.Request.UserRequest;
+import com.unipi.msc.spaceroomapi.Controller.Responses.ReservationPresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.UserPresenter;
 import com.unipi.msc.spaceroomapi.Controller.Responses.UserReservationPresenter;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
@@ -106,6 +107,10 @@ public class UserController {
         }else if(u instanceof Host){
             reservationList = reservationService.getHousesReservation(((Host) u).getHouses());
         }
-        return ResponseEntity.ok(UserReservationPresenter.getReservationPresenter(reservationList));
+        List<ReservationPresenter> presenters = new ArrayList<>();
+        for (Reservation reservation:reservationList){
+            presenters.add(ReservationPresenter.getReservation(reservation));
+        }
+        return ResponseEntity.ok(presenters);
     }
 }

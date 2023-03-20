@@ -20,7 +20,7 @@ public class UserReservationPresenter {
     private HousePresenter house;
     public static List<UserReservationPresenter> getReservationPresenter(List<Reservation> reservations){
         List<UserReservationPresenter> reservationPresenters = new ArrayList<>();
-        for (Reservation reservation:reservations) {
+        for (Reservation reservation:reservations){
             reservationPresenters.add(UserReservationPresenter.builder()
                     .Id(reservation.getId())
                     .price(reservation.getPrice())

@@ -187,13 +187,12 @@ public class AuthenticationService {
             return authenticate(LoginRequest.builder()
                     .username(request.getEmail())
                     .password(request.getPassword())
-                    .role(request.getRole())
                     .build());
         }
         return register(RegisterRequest.builder()
                 .email(request.getEmail())
                 .password(request.getPassword())
-                .role(request.getRole())
+                .role(Role.USER.toString())
                 .build(), true);
     }
 }

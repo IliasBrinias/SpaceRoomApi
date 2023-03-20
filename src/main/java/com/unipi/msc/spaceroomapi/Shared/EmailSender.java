@@ -80,7 +80,10 @@ public class EmailSender {
     }
     private static Document getDocument(String fileName,Reservation r) throws IOException {
         Document doc = Jsoup.parse(new File(HTML_PATH+fileName));
-        doc.body().getElementById("client-name").attr("value", r.getClient().getFirstName()+" "+ r.getClient().getLastName());
+        StringBuilder stringBuilder = new StringBuilder();
+        if (r.getClient().getFirstName() != null) stringBuilder.append(r.getClient().getFirstName()).append(" ");
+        if (r.getClient().getLastName() != null) stringBuilder.append(r.getClient().getLastName());
+        doc.body().getElementById("client-name").attr("value", stringBuilder.toString());
         doc.body().getElementById("house-title").attr("value", r.getHouse().getTitle());
         doc.body().getElementById("price").attr("value", r.getHouse().getPrice().toString());
         doc.body().getElementById("location").attr("value", r.getHouse().getLocation());

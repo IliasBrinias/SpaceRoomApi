@@ -65,7 +65,7 @@ public class ReservationController {
     public ResponseEntity<?> getReservationQr(@PathVariable Long id) throws IOException, WriterException {
         Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
         if (reservation == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_NOT_FOUND));
-        byte[] img = QRGenerator.getQRCodeImage(reservation.getId().toString());
+        byte[] img = QRGenerator.getQRCodeImage("http://localhost:3000/checkin/"+reservation.getId());
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_PNG).body(img);
     }
     @PostMapping("/house/{houseId}/reservation")

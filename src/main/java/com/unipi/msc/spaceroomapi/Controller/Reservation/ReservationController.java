@@ -11,10 +11,7 @@ import com.unipi.msc.spaceroomapi.Model.Enum.ReservationStatus;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
-import com.unipi.msc.spaceroomapi.Model.User.Admin;
-import com.unipi.msc.spaceroomapi.Model.User.Client;
-import com.unipi.msc.spaceroomapi.Model.User.Host;
-import com.unipi.msc.spaceroomapi.Model.User.User;
+import com.unipi.msc.spaceroomapi.Model.User.*;
 import com.unipi.msc.spaceroomapi.Shared.EmailSender;
 import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
 import com.unipi.msc.spaceroomapi.Shared.QRGenerator;
@@ -34,6 +31,8 @@ public class ReservationController {
     private final ReservationRepository reservationRepository;
     private final ReservationService reservationService;
     private final HouseService houseService;
+    private final UserRepository userRepository;
+
     @GetMapping("reservation/all")
     public ResponseEntity<?> getAllReservations() {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -153,6 +152,9 @@ public class ReservationController {
         if (!(u instanceof Admin)) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.NOT_AUTHORIZED));
         Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
         if (reservation == null) return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_NOT_FOUND));
+        Client client = reservation.getClient();
+        client.getReservations().remove(reservation);
+        userRepository.save(client);
         reservationRepository.delete(reservation);
         return ResponseEntity.ok().build();
     }

@@ -167,15 +167,20 @@ public class HouseController {
     }
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteHouse(@PathVariable Long id){
-        Host host;
-        try {
-            host = (Host) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        }catch (ClassCastException ignore){
-            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Host host = null;
+        if (!(u instanceof Admin)){
+            try {
+                host = (Host) u;
+            }catch (ClassCastException ignore){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.USER_MUST_BE_HOST));
+            }
         }
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
+        if (host!=null){
+            if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
+        }
 //        delete Images from the house
         List<Image> images = h.getImages();
         h.getImages().clear();

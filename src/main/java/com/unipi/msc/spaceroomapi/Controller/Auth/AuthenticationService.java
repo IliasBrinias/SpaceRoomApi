@@ -185,7 +185,7 @@ public class AuthenticationService {
     public ResponseEntity<?> loginWithGoogle(LoginRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()){
             return authenticate(LoginRequest.builder()
-                    .username(request.getEmail())
+                    .email(request.getEmail())
                     .password(request.getPassword())
                     .build());
         }

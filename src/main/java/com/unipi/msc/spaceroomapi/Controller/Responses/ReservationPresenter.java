@@ -22,9 +22,10 @@ public class ReservationPresenter {
     private boolean checkIn;
     private String username;
     private String houseTitle;
+    private QRPresenter qr;
 
     public static ReservationPresenter getReservation(Reservation r){
-        return ReservationPresenter.builder()
+        ReservationPresenter presenter = ReservationPresenter.builder()
                 .Id(r.getId())
                 .price(r.getPrice())
                 .date(DateRange.builder()
@@ -39,6 +40,10 @@ public class ReservationPresenter {
                 .houseId(r.getHouse().getId())
                 .username(r.getClient().getUsername())
                 .houseTitle(r.getHouse().getTitle())
+                .qr(QRPresenter.builder()
+                        .link("reservation/"+r.getId()+"/qr")
+                        .build())
                 .build();
+        return presenter;
     }
 }

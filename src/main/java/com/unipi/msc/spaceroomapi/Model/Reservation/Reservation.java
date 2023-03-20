@@ -33,5 +33,6 @@ public class Reservation {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @JsonBackReference
     private Client client;
 }

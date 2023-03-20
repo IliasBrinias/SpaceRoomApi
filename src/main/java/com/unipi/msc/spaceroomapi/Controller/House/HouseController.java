@@ -13,10 +13,9 @@ import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
+import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
-import com.unipi.msc.spaceroomapi.Model.User.Admin;
-import com.unipi.msc.spaceroomapi.Model.User.Host;
-import com.unipi.msc.spaceroomapi.Model.User.User;
+import com.unipi.msc.spaceroomapi.Model.User.*;
 import com.unipi.msc.spaceroomapi.Shared.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -38,6 +37,9 @@ public class HouseController {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final ReservationService reservationService;
+    private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
+
     @PostMapping("/search")
     public ResponseEntity<?> getAllHouses(@RequestBody HouseSearchRequest request){
         List<HousePresenter> housePresenters = new ArrayList<>();
@@ -71,7 +73,7 @@ public class HouseController {
     public ResponseEntity<?> getHouse(@PathVariable Long id){
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
-        List<Reservation> reservations = reservationService.getHouseReservation(h);
+        List<Reservation> reservations = reservationService.getHouseReservationWithSuccessStatus(h);
         return ResponseEntity.ok(HousePresenter.getHouseWithReservationDates(h,reservations));
     }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -174,6 +176,31 @@ public class HouseController {
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
         if (!h.getHost().getId().equals(host.getId())) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.ONLY_THE_HOST_CAN_EDIT_THE_HOUSE));
+//        delete Images from the house
+        List<Image> images = h.getImages();
+        h.getImages().clear();
+        h = houseRepository.save(h);
+//        delete image entities
+        for (Image i:images) {
+            imageRepository.delete(i);
+        }
+        for (Reservation r:reservationService.getHouseReservations(h)) {
+//        delete client reservation
+            Client client = r.getClient();
+            if (client.getReservations().size() == 1) {
+                client.getReservations().clear();
+            }else {
+                client.getReservations().remove(r);
+            }
+            userRepository.save(client);
+//            delete reservation
+            reservationRepository.delete(r);
+        }
+//        delete house from the host
+        host = h.getHost();
+        host.getHouses().remove(h);
+        userRepository.save(host);
+//        delete house entity
         houseRepository.delete(h);
         return ResponseEntity.ok().build();
     }
@@ -245,7 +272,7 @@ public class HouseController {
         House h = houseService.getHouse(id).orElse(null);
         if (h == null) return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.HOUSE_NOT_FOUND));
         List<ReservationPresenter> response = new ArrayList<>();
-        reservationService.getHouseReservation(h).forEach(r-> response.add(ReservationPresenter.getReservation(r)));
+        reservationService.getHouseReservationWithSuccessStatus(h).forEach(r-> response.add(ReservationPresenter.getReservation(r)));
         return ResponseEntity.ok(response);
     }
 }

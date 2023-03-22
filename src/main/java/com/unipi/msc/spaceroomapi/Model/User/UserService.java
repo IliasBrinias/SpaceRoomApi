@@ -85,8 +85,9 @@ public class UserService {
             }
         }
         if (request.getFirstName()!=null) {
-            if (request.getFirstName().equals(u.getFirstName()))
-            u.setFirstName(request.getFirstName());
+            if (!request.getFirstName().equals(u.getFirstName())) {
+                u.setFirstName(request.getFirstName());
+            }
         }
         if (request.getLastName()!=null) {
             if (!request.getLastName().equals(u.getLastName())){
@@ -94,12 +95,16 @@ public class UserService {
             }
         }
         if (request.getBirthday()!=null) {
-            if (request.getBirthday() != u.getBirthday()) {
+            if (!request.getBirthday().equals(u.getBirthday())) {
                 u.setBirthday(request.getBirthday());
             }
         }
         u = userRepository.save(u);
-        return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u, authenticationService.generateToken(u)));
+        String token = null;
+        UserDao userDao = userDaoService.getLastToken(u).orElse(null);
+        if (userDao!=null){
+            token = userDao.getToken();
+        }
+        return ResponseEntity.ok(authenticationService.getAuthenticationResponse(u, token));
     }
-
 }

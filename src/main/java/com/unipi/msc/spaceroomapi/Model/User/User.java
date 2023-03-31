@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Enum.Gender;
 import com.unipi.msc.spaceroomapi.Model.Enum.Role;
+import com.unipi.msc.spaceroomapi.Model.Message.Message;
 import com.unipi.msc.spaceroomapi.Model.User.UserDao.UserDao;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.collections.ArrayStack;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -60,6 +62,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<UserDao> userDaos = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Message> messages = new ArrayList<>();
+
     public User(String email, String username, String password, @NonNull Role role, Gender gender, String firstName, String lastName, Long birthday) {
         this.email = email;
         this.username = username;

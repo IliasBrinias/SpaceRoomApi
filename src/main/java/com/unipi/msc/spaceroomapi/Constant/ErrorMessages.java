@@ -58,4 +58,6 @@ public class ErrorMessages {
     public static final String USER_MUST_BE_HOST_OR_ADMIN = "User must be host or admin";
     public static final String RESERVATION_IS_REJECTED = "Reservation is rejected";
     public static final String HOUSE_IS_NOT_AVAILABLE = "House is not available";
+    public static final String NO_MESSAGES_FOUND = "No messages found";
+    public static final String RESERVATION_IS_NOT_APPROVED = "Reservation is not approved";
 }

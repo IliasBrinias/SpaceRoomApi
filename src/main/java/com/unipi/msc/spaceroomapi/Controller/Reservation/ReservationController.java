@@ -68,8 +68,8 @@ public class ReservationController {
         byte[] img = QRGenerator.getQRCodeImage("http://localhost:3000/checkin/"+reservation.getId());
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_PNG).body(img);
     }
-    @PostMapping("/house/{houseId}/reservation")
-    public ResponseEntity<?> reservation(@RequestBody ReservationRequest request, @PathVariable Long houseId) {
+    @PostMapping("/house/{houseId}/reservation/create")
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request, @PathVariable Long houseId) {
         Client client;
         try {
             client = (Client) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -92,7 +92,7 @@ public class ReservationController {
                 .dateTo(request.getDate().getTo())
                 .creationDate(new Date().getTime())
                 .uuid(UUID.randomUUID().hashCode())
-                .status(ReservationStatus.SUCCESS)
+                .status(ReservationStatus.PENDING)
                 .build();
         reservation = reservationRepository.save(reservation);
         if (client.getEmail()!=null){
@@ -112,6 +112,27 @@ public class ReservationController {
                 return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_IS_REJECTED));
             }
             reservation.setStatus(ReservationStatus.REJECTED);
+        }else {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
+        }
+        reservation = reservationRepository.save(reservation);
+        if (reservation.getClient().getEmail()!=null){
+            EmailSender.sendRejectReservation(reservation.getClient().getEmail(), reservation);
+        }
+        return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
+    }
+    @PostMapping("/reservation/{id}/accept")
+    public ResponseEntity<?> acceptReservation(@PathVariable Long id) {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Reservation reservation = reservationService.getReservationWithId(id).orElse(null);
+        if (reservation == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.RESERVATION_NOT_FOUND));
+        }
+        if (Objects.equals(reservation.getClient().getId(), u.getId()) || Objects.equals(reservation.getHouse().getHost().getId(), u.getId())){
+            if (reservation.getStatus() == ReservationStatus.REJECTED){
+                return ResponseEntity.badRequest().body(new ErrorResponse(false,ErrorMessages.RESERVATION_IS_REJECTED));
+            }
+            reservation.setStatus(ReservationStatus.SUCCESS);
         }else {
             return ResponseEntity.badRequest().body(new ErrorResponse(false, ErrorMessages.NOT_AUTHORIZED_TO_REJECT_THIS_RESERVATION));
         }

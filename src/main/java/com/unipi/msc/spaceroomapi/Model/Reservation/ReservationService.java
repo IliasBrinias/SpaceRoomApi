@@ -21,6 +21,7 @@ public class ReservationService {
     }
     public List<Reservation> getHouseReservationWithSuccessStatus(House h) {
         return reservationRepository.findAllByHouseAndStatusOrderByDateFromAsc(h, ReservationStatus.SUCCESS);
+
     }
     public List<Reservation> getHouseReservations(House h) {
         return reservationRepository.findAllByHouse(h);

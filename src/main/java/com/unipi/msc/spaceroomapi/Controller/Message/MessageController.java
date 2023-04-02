@@ -9,6 +9,7 @@ import com.unipi.msc.spaceroomapi.Model.Message.Message;
 import com.unipi.msc.spaceroomapi.Model.Message.MessageRepository;
 import com.unipi.msc.spaceroomapi.Model.Message.MessageService;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
+import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
 import com.unipi.msc.spaceroomapi.Model.User.User;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.Objects;
 public class MessageController {
 
     private final ReservationService reservationService;
+    private final ReservationRepository reservationRepository;
     private final MessageService messageService;
     private final MessageRepository messageRepository;
     @GetMapping("reservation/{id}/message")
@@ -53,6 +55,9 @@ public class MessageController {
                 .date(request.getDate())
                 .reservation(reservation)
                 .build());
+        if (reservation.getMessages() == null) reservation.setMessages(new ArrayList<>());
+        reservation.getMessages().add(message);
+        reservationRepository.save(reservation);
         return ResponseEntity.ok(MessagePresenter.getPresenter(message));
     }
 }

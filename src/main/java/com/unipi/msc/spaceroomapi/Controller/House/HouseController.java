@@ -12,6 +12,8 @@ import com.unipi.msc.spaceroomapi.Model.House.HouseService;
 import com.unipi.msc.spaceroomapi.Model.Image.Image;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageRepository;
 import com.unipi.msc.spaceroomapi.Model.Image.ImageService;
+import com.unipi.msc.spaceroomapi.Model.Message.Message;
+import com.unipi.msc.spaceroomapi.Model.Message.MessageRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.Reservation;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationRepository;
 import com.unipi.msc.spaceroomapi.Model.Reservation.ReservationService;
@@ -39,6 +41,7 @@ public class HouseController {
     private final ReservationService reservationService;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final MessageRepository messageRepository;
 
     @PostMapping("/search")
     public ResponseEntity<?> getAllHouses(@RequestBody HouseSearchRequest request){
@@ -186,12 +189,14 @@ public class HouseController {
         h.getImages().clear();
         h = houseRepository.save(h);
 //        delete image entities
-        for (Image i:images) {
-            imageRepository.delete(i);
-        }
+        imageRepository.deleteAll(images);
         for (Reservation r:reservationService.getHouseReservations(h)) {
 //        delete client reservation
+            List<Message> messages = r.getMessages();
+            messageRepository.deleteAll(messages);
+
             Client client = r.getClient();
+            client.getMessages().removeAll(messages);
             if (client.getReservations().size() == 1) {
                 client.getReservations().clear();
             }else {

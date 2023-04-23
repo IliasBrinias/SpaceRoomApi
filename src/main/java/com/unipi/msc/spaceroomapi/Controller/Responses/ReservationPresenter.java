@@ -17,6 +17,7 @@ public class ReservationPresenter {
     private DateRange date;
     private Long clientId;
     private Long houseId;
+    private Long hostId;
     private Long creationDate;
     private int uuid;
     private boolean checkIn;
@@ -43,6 +44,7 @@ public class ReservationPresenter {
                 .qr(QRPresenter.builder()
                         .link("reservation/"+r.getId()+"/qr")
                         .build())
+                .hostId(r.getHouse().getHost().getId())
                 .build();
         return presenter;
     }

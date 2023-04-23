@@ -95,9 +95,6 @@ public class ReservationController {
                 .status(ReservationStatus.PENDING)
                 .build();
         reservation = reservationRepository.save(reservation);
-        if (client.getEmail()!=null){
-            EmailSender.sendAcceptReservation(client.getEmail(), reservation);
-        }
         return ResponseEntity.ok(ReservationPresenter.getReservation(reservation));
     }
     @PostMapping("/reservation/{id}/reject")
